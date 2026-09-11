@@ -1,0 +1,161 @@
+=== pacenotch --from - --color never --width 40 (exit 0)
+5h    █████████┃▍░░░░░░░░  55%/50% +5 ●
+five_ ████████▌┃░░░░░░░░░  45%/50% -5 ●
+five_ ████████▌┃░░░░░░░░░  45%/50% -5 ▼
+five_ █████████┃▍░░░░░░░░  55%/50% +5 ▲
+=== pacenotch --from - --color never --width 59 (exit 0)
+5h    ███████████████████┃▉░░░░░░░░░░░░░░░░░  55%/50% +5 ●
+five_ █████████████████░░┃░░░░░░░░░░░░░░░░░░  45%/50% -5 ●
+five_ █████████████████░░┃░░░░░░░░░░░░░░░░░░  45%/50% -5 ▼
+five_ ███████████████████┃▉░░░░░░░░░░░░░░░░░  55%/50% +5 ▲
+=== pacenotch --from - --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  55% used  pace 50%  (+5)  ● on pace
+  resets in 2h 30m 
+ █████████████████████████████┃█▉░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+ 5h x  45% used  pace 50%  (-5)  ● on pace
+  resets in 2h 30m 
+ ██████████████████████████░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~90% at reset
+
+ 5h y  45% used  pace 50%  (-5)  ▼ room to spare
+  resets in 2h 30m 
+ ██████████████████████████░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~90% at reset
+
+ 5h z  55% used  pace 50%  (+5)  ▲ slow down
+  resets in 2h 30m 
+ █████████████████████████████┃█▉░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+=== pacenotch --from - --color never --width 90 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  55% used  pace 50%  (+5)  ● on pace                        resets in 2h 30m 
+ ████████████████████████████████████████████┃███▍░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+ 5h x  45% used  pace 50%  (-5)  ● on pace                              resets in 2h 30m 
+ ███████████████████████████████████████▌░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h y  45% used  pace 50%  (-5)  ▼ room to spare                        resets in 2h 30m 
+ ███████████████████████████████████████▌░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h z  55% used  pace 50%  (+5)  ▲ slow down                            resets in 2h 30m 
+ ████████████████████████████████████████████┃███▍░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+=== pacenotch --from - --color never --width 200 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                                                                                                                                   from - 
+
+ 5h session  55% used  pace 50%  (+5)  ● on pace                                                                                                                                      resets in 2h 30m 
+ ███████████████████████████████████████████████████████████████████████████████████████████████████┃████████▉░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: limit in 2h 2m, 27m before reset
+
+ 5h x  45% used  pace 50%  (-5)  ● on pace                                                                                                                                            resets in 2h 30m 
+ █████████████████████████████████████████████████████████████████████████████████████████░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h y  45% used  pace 50%  (-5)  ▼ room to spare                                                                                                                                      resets in 2h 30m 
+ ████████████████████████████████████████████████████████████████████████████████████████▉░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h z  55% used  pace 50%  (+5)  ▲ slow down                                                                                                                                          resets in 2h 30m 
+ ███████████████████████████████████████████████████████████████████████████████████████████████████┃█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: limit in 2h 2m, 27m before reset
+
+=== pacenotch --from - --color never --width 90 -c (exit 0)
+5h    ██████████████████████████████████┃██▉░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  55%/50% +5 ●
+five_ ███████████████████████████████░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  45%/50% -5 ●
+five_ ██████████████████████████████▉░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  45%/50% -5 ▼
+five_ ██████████████████████████████████┃███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  55%/50% +5 ▲
+=== pacenotch --from - --color never --width 90 -b 10 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  55% used  pace 50%  (+5)  ● on pace                        resets in 2h 30m 
+ ████████████████████████████████████████████┃███▍░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+ 5h x  45% used  pace 50%  (-5)  ● on pace                              resets in 2h 30m 
+ ███████████████████████████████████████▌░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h y  45% used  pace 50%  (-5)  ● on pace                              resets in 2h 30m 
+ ███████████████████████████████████████▌░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~90% at reset
+
+ 5h z  55% used  pace 50%  (+5)  ● on pace                              resets in 2h 30m 
+ ████████████████████████████████████████████┃███▍░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+=== pacenotch --from - --color always --width 40 (exit 0)
+5h    [0m[33m█████████[0m[43m[1;97m┃[0m[33m▍[0m[90m░░░░░░░░[0m  [33m55%/50% +5[0m [33m●[0m
+five_ [0m[33m████████▌[0m[1;97m┃[0m[90m░░░░░░░░░[0m  [33m45%/50% -5[0m [33m●[0m
+five_ [0m[32m████████▌[0m[1;97m┃[0m[90m░░░░░░░░░[0m  [32m45%/50% -5[0m [32m▼[0m
+five_ [0m[31m█████████[0m[41m[1;97m┃[0m[31m▍[0m[90m░░░░░░░░[0m  [31m55%/50% +5[0m [31m▲[0m
+=== pacenotch --from - --color always --width 90 (exit 0)
+ [1mpacenotch[0m   Fri 11 Sep 11:30                                                     [2mfrom -[0m 
+
+ [1m5h session[0m  [33m[1m55%[0m used  pace 50%  (+5)  [33m● on pace[0m                        [2mresets in 2h 30m[0m 
+ [0m[33m████████████████████████████████████████████[0m[43m[1;97m┃[0m[33m███▍[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)[0m
+[33m   at this rate: limit in 2h 2m, 27m before reset[0m
+
+ [1m5h x[0m  [33m[1m45%[0m used  pace 50%  (-5)  [33m● on pace[0m                              [2mresets in 2h 30m[0m 
+ [0m[33m███████████████████████████████████████▌[0m[90m░░░░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)[0m[2m   at this rate: ~90% at reset[0m
+
+ [1m5h y[0m  [32m[1m45%[0m used  pace 50%  (-5)  [32m▼ room to spare[0m                        [2mresets in 2h 30m[0m 
+ [0m[32m███████████████████████████████████████▌[0m[90m░░░░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)[0m[2m   at this rate: ~90% at reset[0m
+
+ [1m5h z[0m  [31m[1m55%[0m used  pace 50%  (+5)  [31m▲ slow down[0m                            [2mresets in 2h 30m[0m 
+ [0m[31m████████████████████████████████████████████[0m[41m[1;97m┃[0m[31m███▍[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)[0m
+[31m   at this rate: limit in 2h 2m, 27m before reset[0m
+
+=== pacenotch --from - --ascii --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  55% used  pace 50%  (+5)  ● on pace
+  resets in 2h 30m 
+ #############################|##--------------------------
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+ 5h x  45% used  pace 50%  (-5)  ● on pace
+  resets in 2h 30m 
+ ##########################---|----------------------------
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~90% at reset
+
+ 5h y  45% used  pace 50%  (-5)  ▼ room to spare
+  resets in 2h 30m 
+ ##########################---|----------------------------
+   budget 22.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~90% at reset
+
+ 5h z  55% used  pace 50%  (+5)  ▲ slow down
+  resets in 2h 30m 
+ #############################|##--------------------------
+   budget 18.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 2h 2m, 27m before reset
+
+=== pacenotch --from - --ascii --color always --width 40 (exit 0)
+5h    [0m[33m#########[0m[43m[1;97m|[0m[33m-[0m[90m--------[0m  [33m55%/50% +5[0m [33m●[0m
+five_ [0m[33m#########[0m[1;97m|[0m[90m---------[0m  [33m45%/50% -5[0m [33m●[0m
+five_ [0m[32m#########[0m[1;97m|[0m[90m---------[0m  [32m45%/50% -5[0m [32m▼[0m
+five_ [0m[31m#########[0m[41m[1;97m|[0m[31m-[0m[90m--------[0m  [31m55%/50% +5[0m [31m▲[0m

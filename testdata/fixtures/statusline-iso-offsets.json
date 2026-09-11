@@ -1,0 +1,4 @@
+{"five_hour":{"used_percentage":52,"resets_at":"2026-09-11T16:00:00+02:00"},
+ "seven_day":{"used_percentage":30,"resets_at":"2026-09-13T19:29:59-05:30"},
+ "seven_day_sonnet":{"used_percentage":5,"resets_at":"2026-09-14T00:59:59.123Z"},
+ "seven_day_opus":{"used_percentage":70,"resets_at":"2026-09-14T02:59:59+0200"}}

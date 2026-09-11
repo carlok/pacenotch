@@ -1,0 +1,6 @@
+{"seven_day_foo":{"utilization":3,"resets_at":"2026-09-14T00:59:59Z"},
+ "seven_day":{"utilization":71,"resets_at":"2026-09-14T00:59:59Z"},
+ "five_hour_bar":{"utilization":20,"resets_at":"2026-09-11T14:00:00Z"},
+ "seven_day_opus":{"utilization":110,"resets_at":"2026-09-14T00:59:59Z"},
+ "five_hour":{"utilization":100,"resets_at":"2026-09-11T14:00:00Z"},
+ "extra_usage":{"is_enabled":true,"monthly_limit":5000,"used_credits":1880,"utilization":37.6}}

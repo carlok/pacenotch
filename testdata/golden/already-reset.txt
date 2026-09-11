@@ -1,0 +1,118 @@
+=== pacenotch --from - --color never --width 40 (exit 0)
+5h    ░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d    ░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d S  ██████▊░░░░░░░░░┃  40%/100% -60 ▼
+=== pacenotch --from - --color never --width 59 (exit 0)
+5h    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d S  ██████████████▍░░░░░░░░░░░░░░░░░░░░┃  40%/100% -60 ▼
+=== pacenotch --from - --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  0% used  ○ not started
+  starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d all models  0% used  ○ not started
+  starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d Sonnet  40% used  pace 100%  (-60)  ▼ room to spare
+  resets in 0m 
+ ███████████████████████▏░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃
+   budget 5184000.0%/day for 0m (flat pace 14.3%/day)
+   at this rate: ~40% at reset
+
+=== pacenotch --from - --color never --width 90 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  0% used  ○ not started                        starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d all models  0% used  ○ not started                     starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d Sonnet  40% used  pace 100%  (-60)  ▼ room to spare                     resets in 0m 
+ ███████████████████████████████████▏░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃
+   budget 5184000.0%/day for 0m (flat pace 14.3%/day)   at this rate: ~40% at reset
+
+=== pacenotch --from - --color never --width 200 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                                                                                                                                   from - 
+
+ 5h session  0% used  ○ not started                                                                                                                                      starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d all models  0% used  ○ not started                                                                                                                                   starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d Sonnet  40% used  pace 100%  (-60)  ▼ room to spare                                                                                                                                   resets in 0m 
+ ███████████████████████████████████████████████████████████████████████████████▏░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃
+   budget 5184000.0%/day for 0m (flat pace 14.3%/day)   at this rate: ~40% at reset
+
+=== pacenotch --from - --color never --width 90 -c (exit 0)
+5h    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0% idle ○
+7d S  ██████████████████████████▊░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃  40%/100% -60 ▼
+=== pacenotch --from - --color never --width 90 -b 10 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  0% used  ○ not started                        starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d all models  0% used  ○ not started                     starts with your next message 
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   full budget available, no active window
+
+ 7d Sonnet  40% used  pace 100%  (-60)  ▼ room to spare                     resets in 0m 
+ ███████████████████████████████████▏░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃
+   budget 5184000.0%/day for 0m (flat pace 14.3%/day)   at this rate: ~40% at reset
+
+=== pacenotch --from - --color always --width 40 (exit 0)
+5h    [0m[90m░░░░░░░░░░░░░░░░░░░░░░[0m  [36m0% idle[0m [36m○[0m
+7d    [0m[90m░░░░░░░░░░░░░░░░░░░░░░[0m  [36m0% idle[0m [36m○[0m
+7d S  [0m[32m██████▊[0m[90m░░░░░░░░░[0m[1;97m┃[0m  [32m40%/100% -60[0m [32m▼[0m
+=== pacenotch --from - --color always --width 90 (exit 0)
+ [1mpacenotch[0m   Fri 11 Sep 11:30                                                     [2mfrom -[0m 
+
+ [1m5h session[0m  [36m[1m0%[0m used  [36m○ not started[0m                        [2mstarts with your next message[0m 
+ [0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   full budget available, no active window[0m
+
+ [1m7d all models[0m  [36m[1m0%[0m used  [36m○ not started[0m                     [2mstarts with your next message[0m 
+ [0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   full budget available, no active window[0m
+
+ [1m7d Sonnet[0m  [32m[1m40%[0m used  pace 100%  (-60)  [32m▼ room to spare[0m                     [2mresets in 0m[0m 
+ [0m[32m███████████████████████████████████▏[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m[1;97m┃[0m
+[2m   budget 5184000.0%/day for 0m (flat pace 14.3%/day)[0m[2m   at this rate: ~40% at reset[0m
+
+=== pacenotch --from - --ascii --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  0% used  ○ not started
+  starts with your next message 
+ ----------------------------------------------------------
+   full budget available, no active window
+
+ 7d all models  0% used  ○ not started
+  starts with your next message 
+ ----------------------------------------------------------
+   full budget available, no active window
+
+ 7d Sonnet  40% used  pace 100%  (-60)  ▼ room to spare
+  resets in 0m 
+ #######################----------------------------------|
+   budget 5184000.0%/day for 0m (flat pace 14.3%/day)
+   at this rate: ~40% at reset
+
+=== pacenotch --from - --ascii --color always --width 40 (exit 0)
+5h    [0m[90m----------------------[0m  [36m0% idle[0m [36m○[0m
+7d    [0m[90m----------------------[0m  [36m0% idle[0m [36m○[0m
+7d S  [0m[32m#######[0m[90m---------[0m[1;97m|[0m  [32m40%/100% -60[0m [32m▼[0m

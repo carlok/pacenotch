@@ -1,0 +1,208 @@
+=== pacenotch --from - --color never --width 40 (exit 2)
+5h    ████████┃████████  100%/50% +50 ▲
+7d    ████████████┃▍░░░░░  71%/63% +8 ▲
+seven ▌░░░░░░░░░░░┃░░░░░░  3%/63% -60 ▼
+five_ ███▌░░░░░┃░░░░░░░░  20%/50% -30 ▼
+7d O  ██████████┃██████  110%/63% +47 ▲
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 59 (exit 2)
+5h    ██████████████████┃█████████████████  100%/50% +50 ▲
+7d    ████████████████████████┃█▉░░░░░░░░░░░  71%/63% +8 ▲
+seven █▏░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░  3%/63% -60 ▼
+five_ ███████▍░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░  20%/50% -30 ▼
+7d O  ██████████████████████┃█████████████  110%/63% +47 ▲
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 60 (exit 2)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  100% used  pace 50%  (+50)  ▲ slow down
+  resets in 2h 30m 
+ █████████████████████████████┃████████████████████████████
+   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 0m, 2h 30m before reset
+
+ 7d all models  71% used  pace 63%  (+8)  ▲ slow down
+  resets in 2d 13h 
+ ████████████████████████████████████┃████▏░░░░░░░░░░░░░░░░
+   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 1d 19h, 17h 59m before reset
+
+ 7d foo  3% used  pace 63%  (-60)  ▼ room to spare
+  resets in 2d 13h 
+ █▋░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░
+   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: ~5% at reset
+
+ 5h bar  20% used  pace 50%  (-30)  ▼ room to spare
+  resets in 2h 30m 
+ ███████████▌░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~40% at reset
+
+ 7d Opus  110% used  pace 63%  (+47)  ▲ slow down
+  resets in 2d 13h 
+ ████████████████████████████████████┃█████████████████████
+   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 0m, 2d 13h before reset
+
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 90 (exit 2)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  100% used  pace 50%  (+50)  ▲ slow down                    resets in 2h 30m 
+ ████████████████████████████████████████████┃███████████████████████████████████████████
+   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 0m, 2h 30m before reset
+
+ 7d all models  71% used  pace 63%  (+8)  ▲ slow down                   resets in 2d 13h 
+ ███████████████████████████████████████████████████████┃██████▍░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 1d 19h, 17h 59m before reset
+
+ 7d foo  3% used  pace 63%  (-60)  ▼ room to spare                      resets in 2d 13h 
+ ██▋░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)   at this rate: ~5% at reset
+
+ 5h bar  20% used  pace 50%  (-30)  ▼ room to spare                     resets in 2h 30m 
+ █████████████████▌░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~40% at reset
+
+ 7d Opus  110% used  pace 63%  (+47)  ▲ slow down                       resets in 2d 13h 
+ ███████████████████████████████████████████████████████┃████████████████████████████████
+   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 0m, 2d 13h before reset
+
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 200 (exit 2)
+ pacenotch   Fri 11 Sep 11:30                                                                                                                                                                   from - 
+
+ 5h session  100% used  pace 50%  (+50)  ▲ slow down                                                                                                                                  resets in 2h 30m 
+ ███████████████████████████████████████████████████████████████████████████████████████████████████┃██████████████████████████████████████████████████████████████████████████████████████████████████
+   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: limit in 0m, 2h 30m before reset
+
+ 7d all models  71% used  pace 63%  (+8)  ▲ slow down                                                                                                                                 resets in 2d 13h 
+ █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████┃██████████████▌░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)   at this rate: limit in 1d 19h, 17h 59m before reset
+
+ 7d foo  3% used  pace 63%  (-60)  ▼ room to spare                                                                                                                                    resets in 2d 13h 
+ █████▉░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)   at this rate: ~5% at reset
+
+ 5h bar  20% used  pace 50%  (-30)  ▼ room to spare                                                                                                                                   resets in 2h 30m 
+ ███████████████████████████████████████▌░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~40% at reset
+
+ 7d Opus  110% used  pace 63%  (+47)  ▲ slow down                                                                                                                                     resets in 2d 13h 
+ █████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████┃████████████████████████████████████████████████████████████████████████
+   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)   at this rate: limit in 0m, 2d 13h before reset
+
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 90 -c (exit 2)
+5h    █████████████████████████████████┃█████████████████████████████████  100%/50% +50 ▲
+7d    ███████████████████████████████████████████┃████▉░░░░░░░░░░░░░░░░░░░░  71%/63% +8 ▲
+seven ██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░  3%/63% -60 ▼
+five_ █████████████▌░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  20%/50% -30 ▼
+7d O  ██████████████████████████████████████████┃████████████████████████  110%/63% +47 ▲
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color never --width 90 -b 10 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  100% used  pace 50%  (+50)  ▲ slow down                    resets in 2h 30m 
+ ████████████████████████████████████████████┃███████████████████████████████████████████
+   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 0m, 2h 30m before reset
+
+ 7d all models  71% used  pace 63%  (+8)  ● on pace                     resets in 2d 13h 
+ ███████████████████████████████████████████████████████┃██████▍░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 1d 19h, 17h 59m before reset
+
+ 7d foo  3% used  pace 63%  (-60)  ▼ room to spare                      resets in 2d 13h 
+ ██▋░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)   at this rate: ~5% at reset
+
+ 5h bar  20% used  pace 50%  (-30)  ▼ room to spare                     resets in 2h 30m 
+ █████████████████▌░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)   at this rate: ~40% at reset
+
+ 7d Opus  110% used  pace 63%  (+47)  ▲ slow down                       resets in 2d 13h 
+ ███████████████████████████████████████████████████████┃████████████████████████████████
+   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 0m, 2d 13h before reset
+
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --color always --width 40 (exit 2)
+5h    [0m[31m████████[0m[41m[1;97m┃[0m[31m████████[0m  [31m100%/50% +50[0m [31m▲[0m
+7d    [0m[31m████████████[0m[41m[1;97m┃[0m[31m▍[0m[90m░░░░░[0m  [31m71%/63% +8[0m [31m▲[0m
+seven [0m[32m▌[0m[90m░░░░░░░░░░░[0m[1;97m┃[0m[90m░░░░░░[0m  [32m3%/63% -60[0m [32m▼[0m
+five_ [0m[32m███▌[0m[90m░░░░░[0m[1;97m┃[0m[90m░░░░░░░░[0m  [32m20%/50% -30[0m [32m▼[0m
+7d O  [0m[31m██████████[0m[41m[1;97m┃[0m[31m██████[0m  [31m110%/63% +47[0m [31m▲[0m
+[2m extra usage: on (38% of monthly limit)[0m
+=== pacenotch --from - --color always --width 90 (exit 2)
+ [1mpacenotch[0m   Fri 11 Sep 11:30                                                     [2mfrom -[0m 
+
+ [1m5h session[0m  [31m[1m100%[0m used  pace 50%  (+50)  [31m▲ slow down[0m                    [2mresets in 2h 30m[0m 
+ [0m[31m████████████████████████████████████████████[0m[41m[1;97m┃[0m[31m███████████████████████████████████████████[0m
+[2m   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)[0m
+[31m   at this rate: limit in 0m, 2h 30m before reset[0m
+
+ [1m7d all models[0m  [31m[1m71%[0m used  pace 63%  (+8)  [31m▲ slow down[0m                   [2mresets in 2d 13h[0m 
+ [0m[31m███████████████████████████████████████████████████████[0m[41m[1;97m┃[0m[31m██████▍[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)[0m
+[31m   at this rate: limit in 1d 19h, 17h 59m before reset[0m
+
+ [1m7d foo[0m  [32m[1m3%[0m used  pace 63%  (-60)  [32m▼ room to spare[0m                      [2mresets in 2d 13h[0m 
+ [0m[32m██▋[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)[0m[2m   at this rate: ~5% at reset[0m
+
+ [1m5h bar[0m  [32m[1m20%[0m used  pace 50%  (-30)  [32m▼ room to spare[0m                     [2mresets in 2h 30m[0m 
+ [0m[32m█████████████████▌[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)[0m[2m   at this rate: ~40% at reset[0m
+
+ [1m7d Opus[0m  [31m[1m110%[0m used  pace 63%  (+47)  [31m▲ slow down[0m                       [2mresets in 2d 13h[0m 
+ [0m[31m███████████████████████████████████████████████████████[0m[41m[1;97m┃[0m[31m████████████████████████████████[0m
+[2m   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)[0m
+[31m   at this rate: limit in 0m, 2d 13h before reset[0m
+
+[2m extra usage: on (38% of monthly limit)[0m
+=== pacenotch --from - --ascii --color never --width 60 (exit 2)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  100% used  pace 50%  (+50)  ▲ slow down
+  resets in 2h 30m 
+ #############################|############################
+   budget 0.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: limit in 0m, 2h 30m before reset
+
+ 7d all models  71% used  pace 63%  (+8)  ▲ slow down
+  resets in 2d 13h 
+ ####################################|####-----------------
+   budget 11.3%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 1d 19h, 17h 59m before reset
+
+ 7d foo  3% used  pace 63%  (-60)  ▼ room to spare
+  resets in 2d 13h 
+ ##----------------------------------|---------------------
+   budget 37.9%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: ~5% at reset
+
+ 5h bar  20% used  pace 50%  (-30)  ▼ room to spare
+  resets in 2h 30m 
+ ############-----------------|----------------------------
+   budget 32.0%/h for 2h 30m (flat pace 20.0%/h)
+   at this rate: ~40% at reset
+
+ 7d Opus  110% used  pace 63%  (+47)  ▲ slow down
+  resets in 2d 13h 
+ ####################################|#####################
+   budget 0.0%/day for 2d 13h (flat pace 14.3%/day)
+   at this rate: limit in 0m, 2d 13h before reset
+
+ extra usage: on (38% of monthly limit)
+=== pacenotch --from - --ascii --color always --width 40 (exit 2)
+5h    [0m[31m########[0m[41m[1;97m|[0m[31m########[0m  [31m100%/50% +50[0m [31m▲[0m
+7d    [0m[31m############[0m[41m[1;97m|[0m[31m-[0m[90m-----[0m  [31m71%/63% +8[0m [31m▲[0m
+seven [0m[32m#[0m[90m-----------[0m[1;97m|[0m[90m------[0m  [32m3%/63% -60[0m [32m▼[0m
+five_ [0m[32m####[0m[90m-----[0m[1;97m|[0m[90m--------[0m  [32m20%/50% -30[0m [32m▼[0m
+7d O  [0m[31m##########[0m[41m[1;97m|[0m[31m######[0m  [31m110%/63% +47[0m [31m▲[0m
+[2m extra usage: on (38% of monthly limit)[0m

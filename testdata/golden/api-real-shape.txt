@@ -1,0 +1,89 @@
+=== pacenotch --from - --color never --width 40 (exit 0)
+5h    █▊░░░░░░░┃░░░░░░░░  10%/53% -43 ▼
+7d    ████████▉┃░░░░░░░░░  47%/49% -2 ●
+=== pacenotch --from - --color never --width 59 (exit 0)
+5h    ███▋░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░  10%/53% -43 ▼
+7d    █████████████████▊┃░░░░░░░░░░░░░░░░░░░  47%/49% -2 ●
+=== pacenotch --from - --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  10% used  pace 53%  (-43)  ▼ room to spare
+  resets in 2h 20m 
+ █████▊░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)
+   at this rate: ~19% at reset
+
+ 7d all models  47% used  pace 49%  (-2)  ● on pace
+  resets in 3d 13h 
+ ███████████████████████████▎┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)
+   at this rate: ~96% at reset
+
+=== pacenotch --from - --color never --width 90 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  10% used  pace 53%  (-43)  ▼ room to spare                 resets in 2h 20m 
+ ████████▊░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)   at this rate: ~19% at reset
+
+ 7d all models  47% used  pace 49%  (-2)  ● on pace                     resets in 3d 13h 
+ █████████████████████████████████████████▎░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)   at this rate: ~96% at reset
+
+=== pacenotch --from - --color never --width 200 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                                                                                                                                   from - 
+
+ 5h session  10% used  pace 53%  (-43)  ▼ room to spare                                                                                                                               resets in 2h 20m 
+ ███████████████████▊░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)   at this rate: ~19% at reset
+
+ 7d all models  47% used  pace 49%  (-2)  ● on pace                                                                                                                                   resets in 3d 13h 
+ █████████████████████████████████████████████████████████████████████████████████████████████░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)   at this rate: ~96% at reset
+
+=== pacenotch --from - --color never --width 90 -c (exit 0)
+5h    ██████▊░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  10%/53% -43 ▼
+7d    ████████████████████████████████▍┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  47%/49% -2 ●
+=== pacenotch --from - --color never --width 90 -b 10 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                                                     from - 
+
+ 5h session  10% used  pace 53%  (-43)  ▼ room to spare                 resets in 2h 20m 
+ ████████▊░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)   at this rate: ~19% at reset
+
+ 7d all models  47% used  pace 49%  (-2)  ● on pace                     resets in 3d 13h 
+ █████████████████████████████████████████▎░┃░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)   at this rate: ~96% at reset
+
+=== pacenotch --from - --color always --width 40 (exit 0)
+5h    [0m[32m█▊[0m[90m░░░░░░░[0m[1;97m┃[0m[90m░░░░░░░░[0m  [32m10%/53% -43[0m [32m▼[0m
+7d    [0m[33m████████▉[0m[1;97m┃[0m[90m░░░░░░░░░[0m  [33m47%/49% -2[0m [33m●[0m
+=== pacenotch --from - --color always --width 90 (exit 0)
+ [1mpacenotch[0m   Fri 11 Sep 11:30                                                     [2mfrom -[0m 
+
+ [1m5h session[0m  [32m[1m10%[0m used  pace 53%  (-43)  [32m▼ room to spare[0m                 [2mresets in 2h 20m[0m 
+ [0m[32m████████▊[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)[0m[2m   at this rate: ~19% at reset[0m
+
+ [1m7d all models[0m  [33m[1m47%[0m used  pace 49%  (-2)  [33m● on pace[0m                     [2mresets in 3d 13h[0m 
+ [0m[33m█████████████████████████████████████████▎[0m[90m░[0m[1;97m┃[0m[90m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░[0m
+[2m   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)[0m[2m   at this rate: ~96% at reset[0m
+
+=== pacenotch --from - --ascii --color never --width 60 (exit 0)
+ pacenotch   Fri 11 Sep 11:30                       from - 
+
+ 5h session  10% used  pace 53%  (-43)  ▼ room to spare
+  resets in 2h 20m 
+ ######------------------------|---------------------------
+   budget 38.6%/h for 2h 20m (flat pace 20.0%/h)
+   at this rate: ~19% at reset
+
+ 7d all models  47% used  pace 49%  (-2)  ● on pace
+  resets in 3d 13h 
+ ###########################-|-----------------------------
+   budget 14.9%/day for 3d 13h (flat pace 14.3%/day)
+   at this rate: ~96% at reset
+
+=== pacenotch --from - --ascii --color always --width 40 (exit 0)
+5h    [0m[32m##[0m[90m-------[0m[1;97m|[0m[90m--------[0m  [32m10%/53% -43[0m [32m▼[0m
+7d    [0m[33m#########[0m[1;97m|[0m[90m---------[0m  [33m47%/49% -2[0m [33m●[0m

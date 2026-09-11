@@ -1,0 +1,7 @@
+# name                     min  include-regex (module-relative file path)  [exclude-regex]
+# Thresholds are fixed by the project spec: do not lower them to pass the gate.
+internal/pace               100  ^internal/pace/
+internal/usage               90  ^internal/usage/
+internal/tui                 90  ^internal/tui/
+internal/gui(model+raster)   90  ^internal/gui/                              _fyne\.go$
+module(unit+e2e)             85  .
