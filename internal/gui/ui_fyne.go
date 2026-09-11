@@ -156,6 +156,7 @@ func (u *UI) Menu() *fyne.Menu {
 func (u *UI) ShowWindow() {
 	u.Window.Show()
 	u.Window.RequestFocus()
+	bringToFront()
 }
 
 func (u *UI) refresh() {
@@ -276,4 +277,5 @@ func (u *UI) ShowAbout() {
 	}
 	u.about.Show()
 	u.about.RequestFocus()
+	bringToFront()
 }
