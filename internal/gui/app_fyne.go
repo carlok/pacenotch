@@ -47,6 +47,7 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	ui := NewUI(a, version)
 	ctrl := &Controller{Load: loader.Load, Now: now, Band: opts.Band, Publish: ui.Publish}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }
+	setReopenHandler(func() { fyne.Do(ui.ShowWindow) }) // opened again while running
 	a.Lifecycle().SetOnStarted(func() {
 		hideDockIcon()
 		go ctrl.Run(ctx, time.Minute, time.After) // redraw every 60 s, fetch per TTL
