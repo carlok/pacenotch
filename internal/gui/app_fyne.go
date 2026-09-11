@@ -43,6 +43,7 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	a := app.NewWithID(AppID)
+	a.SetIcon(fyne.NewStaticResource("pacenotch.png", EncodePNG(AppIcon(256))))
 	ui := NewUI(a, version)
 	ctrl := &Controller{Load: loader.Load, Now: now, Band: opts.Band, Publish: ui.Publish}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }

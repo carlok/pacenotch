@@ -127,10 +127,17 @@ func fixtures(t *testing.T) map[string][]byte {
 // TestParity: same input, same now, same flags → the same stdout and exit code as the
 // reference script (patched only to read PACENOTCH_NOW and print "pacenotch").
 func TestParity(t *testing.T) {
-	for _, tool := range []string{"bash", "jq", "curl"} {
+	bash, err := bashPath()
+	if err != nil {
+		t.Skipf("parity needs bash: %v", err)
+	}
+	for _, tool := range []string{"jq", "curl"} {
 		if _, err := exec.LookPath(tool); err != nil {
 			t.Skipf("parity needs %s: %v", tool, err)
 		}
+	}
+	if out, err := exec.Command("jq", "-rn", `"x"`).Output(); err != nil || strings.Contains(string(out), "\r") {
+		t.Skipf("this jq writes CRLF line endings (or fails: %v); the reference script cannot run", err)
 	}
 	reference := filepath.Join("testdata", "reference.sh")
 	for name, data := range fixtures(t) {
@@ -138,7 +145,7 @@ func TestParity(t *testing.T) {
 			for _, v := range variants {
 				for _, from := range []string{"-", "testdata/fixtures/" + name + ".json"} {
 					args := append([]string{"--from", from}, v...)
-					want := run(t, "bash", append([]string{reference}, args...), data, nil)
+					want := run(t, bash, append([]string{reference}, args...), data, nil)
 					got := run(t, bin, args, data, nil)
 					if got.stdout != want.stdout || got.code != want.code {
 						t.Errorf("pacenotch %s\nexit %d, reference exit %d\n%s", strings.Join(args, " "), got.code, want.code,
@@ -148,6 +155,23 @@ func TestParity(t *testing.T) {
 			}
 		})
 	}
+}
+
+// bashPath finds bash; on Windows it prefers Git Bash over the WSL launcher in System32,
+// which would run the script in another environment.
+func bashPath() (string, error) {
+	if runtime.GOOS == "windows" {
+		for _, p := range []string{`C:\Program Files\Git\bin\bash.exe`, `C:\Program Files\Git\usr\bin\bash.exe`} {
+			if _, err := os.Stat(p); err == nil {
+				return p, nil
+			}
+		}
+	}
+	p, err := exec.LookPath("bash")
+	if err == nil && runtime.GOOS == "windows" && strings.Contains(strings.ToLower(p), `\system32\`) {
+		return "", errors.New("only the WSL bash launcher was found")
+	}
+	return p, err
 }
 
 func firstDiff(want, got string) string {

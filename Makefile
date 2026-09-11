@@ -1,7 +1,7 @@
 GO ?= go
 FUZZTIME ?= 10s
 
-.PHONY: test test-gui build-gui cover cover-html fuzz golden reference build clean
+.PHONY: test test-gui build-gui screenshots cover cover-html fuzz golden reference build clean
 
 ## test: race-enabled unit tests
 test:
@@ -11,9 +11,14 @@ test:
 test-gui:
 	$(GO) test -race -tags gui ./internal/gui/... ./cmd/...
 
-## build-gui: native GUI binary in bin/ (pacenotch gui)
+## build-gui: native GUI build for this OS in dist/ (macOS: universal binary + pacenotch.app)
 build-gui:
-	$(GO) build -tags gui -o bin/pacenotch ./cmd/pacenotch
+	scripts/build-gui.sh
+
+## screenshots: README images in docs/ (window, About, tray icons, app icon, terminal SVGs)
+screenshots:
+	PACENOTCH_SCREENSHOTS=docs $(GO) test -count=1 -tags gui ./internal/gui -run Screenshots
+	PACENOTCH_SCREENSHOTS=docs $(GO) test -count=1 ./internal/tui -run TerminalScreenshot
 
 ## cover: merged unit + end-to-end profile, per-package summary and coverage gate
 cover:

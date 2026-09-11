@@ -17,7 +17,7 @@ import (
 )
 
 // canary is a recognizable fake token. It must never show up anywhere.
-const canary = "sk-ant-oat01-CANARY-7c1e5b0d-must-never-appear"
+const canary = "fake-oat01-CANARY-7c1e5b0d-must-never-appear"
 
 // TestTokenNeverLeaks drives every fetch outcome through the loader, including the stale
 // path and cache writes. A hostile server echoes the Authorization header back in every

@@ -2,9 +2,12 @@ package gui
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/carlok/pacenotch/internal/pace"
@@ -70,6 +73,48 @@ func TestTrayIconMissingWindowsAreHollow(t *testing.T) {
 	}
 	if notch != 0 || edge == 0 {
 		t.Errorf("hollow bars: %d notch pixels, %d outline pixels", notch, edge)
+	}
+}
+
+func TestAppIcon(t *testing.T) {
+	th := DarkBars()
+	for _, size := range []int{16, 32, 64, 128, 256, 512, 1024} {
+		img := AppIcon(size)
+		m := size / 10
+		if img.Bounds().Dx() != size || img.Bounds().Dy() != size {
+			t.Fatalf("size %d: bounds %v", size, img.Bounds())
+		}
+		if img.NRGBAAt(0, 0).A != 0 || img.NRGBAAt(m, m).A != 0 {
+			t.Errorf("size %d: the margin and the rounded corner must be transparent", size)
+		}
+		if img.NRGBAAt(size/2, m+1) != rgb(0x1C1C1E) {
+			t.Errorf("size %d: background %v", size, img.NRGBAAt(size/2, m+1))
+		}
+		for i, r := range AppIconBars(size) {
+			checkBar(t, img, r, AppIconRows[i], th)
+		}
+	}
+	if AppIcon(4).Bounds().Dx() != 16 {
+		t.Error("the icon is at least 16 px")
+	}
+}
+
+// TestWriteIconset writes the macOS iconset used by scripts/package-macos.sh.
+func TestWriteIconset(t *testing.T) {
+	dir := os.Getenv("PACENOTCH_ICONSET")
+	if dir == "" {
+		t.Skip("set PACENOTCH_ICONSET=DIR to write pacenotch.iconset")
+	}
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, base := range []int{16, 32, 128, 256, 512} {
+		for scale, suffix := range map[int]string{1: "", 2: "@2x"} {
+			name := fmt.Sprintf("icon_%dx%d%s.png", base, base, suffix)
+			if err := os.WriteFile(filepath.Join(dir, name), EncodePNG(AppIcon(base*scale)), 0o644); err != nil {
+				t.Fatal(err)
+			}
+		}
 	}
 }
 

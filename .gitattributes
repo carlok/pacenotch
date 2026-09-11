@@ -1,0 +1,5 @@
+# Golden files, fixtures and the reference script are compared byte for byte:
+# keep LF line endings on every OS, including Windows checkouts.
+* text=auto eol=lf
+*.png binary
+*.icns binary

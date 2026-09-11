@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const fakeToken = "sk-ant-oat01-FAKE-token-for-tests"
+const fakeToken = "fake-oat01-FAKE-token-for-tests"
 
 var credNow = time.Unix(1789126200, 0)
 

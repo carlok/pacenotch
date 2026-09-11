@@ -17,7 +17,7 @@ import (
 	"github.com/carlok/pacenotch/internal/usage"
 )
 
-const canary = "sk-ant-oat01-CANARY-3b9f0a2e-must-never-appear"
+const canary = "fake-oat01-CANARY-3b9f0a2e-must-never-appear"
 
 // TestCLINeverPrintsToken runs the CLI against a hostile server that echoes the
 // Authorization header in every error body, through success, every error, --raw, the stale

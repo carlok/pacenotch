@@ -34,6 +34,7 @@ func TestScreenshots(t *testing.T) {
 		t.Fatal(err)
 	}
 	v := BuildView(usage.Result{Data: data, Age: 24}, nil, now, 5)
+	write(t, filepath.Join(dir, "icon.png"), AppIcon(256))
 
 	for _, name := range []string{"dark", "light"} {
 		a := test.NewTempApp(t)

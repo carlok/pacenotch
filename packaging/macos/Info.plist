@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>pacenotch</string>
+	<key>CFBundleDisplayName</key>
+	<string>pacenotch</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.carlok.pacenotch</string>
+	<key>CFBundleExecutable</key>
+	<string>pacenotch</string>
+	<key>CFBundleIconFile</key>
+	<string>pacenotch</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@VERSION@</string>
+	<key>CFBundleVersion</key>
+	<string>@VERSION@</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+	<!-- menu bar app: no Dock icon, no app menu -->
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2026 Carlo Perassi · MIT License</string>
+</dict>
+</plist>

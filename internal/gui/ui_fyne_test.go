@@ -165,7 +165,7 @@ func TestAboutWindow(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "v9")
 	u.ShowAbout()
-	u.ShowAbout() // reuses the window
+	u.ShowAbout()                                      // reuses the window
 	all := strings.Join(texts(u.about.Content()), " ") // wrapped paragraphs are one Text per line
 	for _, want := range []string{"pacenotch v9", "github.com/carlok/pacenotch", "Not affiliated with, or endorsed by, Anthropic", "MIT License"} {
 		if !strings.Contains(all, want) {

@@ -15,13 +15,20 @@ var version = "dev"
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	args := os.Args[1:]
 	var code int
-	if len(args) > 0 && args[0] == "gui" {
-		code = runGUI(ctx, args[1:])
+	if guiArgs, ok := wantsGUI(os.Args[1:]); ok {
+		code = runGUI(ctx, guiArgs)
 	} else {
-		code = tui.Main(tui.DefaultDeps(ctx, args, version))
+		code = tui.Main(tui.DefaultDeps(ctx, os.Args[1:], version))
 	}
 	stop()
 	os.Exit(code)
+}
+
+// wantsGUI: `pacenotch gui [flags]`, or a macOS .app bundle started with no arguments.
+func wantsGUI(args []string) ([]string, bool) {
+	if len(args) > 0 && args[0] == "gui" {
+		return args[1:], true
+	}
+	return nil, len(args) == 0 && launchedAsApp()
 }
