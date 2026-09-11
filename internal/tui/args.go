@@ -128,6 +128,7 @@ The notch ┃ marks an even pace: fill past it means ahead of pace, fill short o
   pacenotch --from FILE     read JSON from FILE ('-' = stdin) instead of the API;
                             accepts the API format or the status line rate_limits format
   pacenotch --raw           print the raw JSON and exit
+  pacenotch gui             tray icon and window (GUI builds; pacenotch-gui.exe on Windows)
   options: --ttl SECS (cache, default 60) --width N --color auto|always|never --no-color
            --ascii (#, - and | instead of block characters) --version
 

@@ -132,6 +132,36 @@ func TestLoaderStaleAndErrors(t *testing.T) {
 	}
 }
 
+func TestLoaderAuthErrors(t *testing.T) {
+	tests := []struct {
+		err  error
+		auth bool
+	}{
+		{ErrNoCredentials, true},
+		{ErrNoAccessToken, true},
+		{&FetchError{401, "HTTP 401: token rejected (start Claude Code once to refresh it)"}, true},
+		{&FetchError{500, "HTTP 500 from usage endpoint"}, false},
+		{&FetchError{Msg: "network error"}, false},
+	}
+	for _, tt := range tests {
+		// no cache: a LoadError
+		l, clk := newTestLoader(t, &fakeSource{results: []error{tt.err}})
+		res, err := l.Load(ctx, false)
+		var le *LoadError
+		if !errors.As(err, &le) || le.Auth != tt.auth || res.Auth != tt.auth || le.Error() != tt.err.Error() {
+			t.Errorf("%v: got %+v, %#v", tt.err, res, err)
+		}
+		// stale cache: Result.Auth
+		l.Source = &fakeSource{body: `{}`}
+		l.Load(ctx, true)
+		l.Source = &fakeSource{results: []error{tt.err}}
+		clk.Add(time.Hour)
+		if res, err = l.Load(ctx, false); err != nil || !res.Stale || res.Auth != tt.auth {
+			t.Errorf("%v stale: got %+v, %v", tt.err, res, err)
+		}
+	}
+}
+
 func TestLoaderUnwritableCacheStillReturnsData(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "file")
 	os.WriteFile(file, []byte("x"), 0o600)

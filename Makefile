@@ -1,11 +1,19 @@
 GO ?= go
 FUZZTIME ?= 10s
 
-.PHONY: test cover cover-html fuzz golden reference build clean
+.PHONY: test test-gui build-gui cover cover-html fuzz golden reference build clean
 
 ## test: race-enabled unit tests
 test:
 	$(GO) test -race ./...
+
+## test-gui: race-enabled tests of the Fyne glue (needs cgo and the platform GUI libraries)
+test-gui:
+	$(GO) test -race -tags gui ./internal/gui/... ./cmd/...
+
+## build-gui: native GUI binary in bin/ (pacenotch gui)
+build-gui:
+	$(GO) build -tags gui -o bin/pacenotch ./cmd/pacenotch
 
 ## cover: merged unit + end-to-end profile, per-package summary and coverage gate
 cover:

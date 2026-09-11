@@ -18,6 +18,22 @@ type Result struct {
 	Stale bool   // the fetch failed and Data is the cached copy
 	Err   string // why the data is stale
 	Warn  string // e.g. an expired token
+	Auth  bool   // the failure behind Err is an authentication problem
+}
+
+// LoadError is returned when there is nothing to show. Auth marks credential problems
+// (no credentials, no token, HTTP 401).
+type LoadError struct {
+	Msg  string
+	Auth bool
+}
+
+func (e *LoadError) Error() string { return e.Msg }
+
+func isAuth(err error) bool {
+	var fe *FetchError
+	return errors.Is(err, ErrNoCredentials) || errors.Is(err, ErrNoAccessToken) ||
+		(errors.As(err, &fe) && fe.Status == 401)
 }
 
 // Backoff limits after HTTP 429 in watch and GUI modes.
@@ -89,7 +105,7 @@ func (l *Loader) Load(ctx context.Context, force bool) (Result, error) {
 		return Result{Data: body, Age: 0, Warn: warn}, nil
 	}
 
-	msg := err.Error()
+	msg, auth := err.Error(), isAuth(err)
 	var fe *FetchError
 	if l.Backoff && errors.As(err, &fe) && fe.Status == 429 {
 		l.backoffStep = min(max(2*l.backoffStep, BackoffMin), BackoffMax)
@@ -98,9 +114,9 @@ func (l *Loader) Load(ctx context.Context, force bool) (Result, error) {
 	}
 	l.lastErr = msg
 	if !have {
-		return Result{Warn: warn}, errors.New(msg)
+		return Result{Warn: warn, Auth: auth}, &LoadError{Msg: msg, Auth: auth}
 	}
-	return Result{Data: data, Age: age, Stale: true, Err: msg, Warn: warn}, nil
+	return Result{Data: data, Age: age, Stale: true, Err: msg, Warn: warn, Auth: auth}, nil
 }
 
 // BackoffUntil reports when the current 429 backoff ends (zero when none).

@@ -184,6 +184,7 @@ func TestExitCodes(t *testing.T) {
 		{"missing file", []string{"--from", "testdata/missing.json"}, nil, 1, "", "pacenotch: cannot read testdata/missing.json\n"},
 		{"unknown flag", []string{"--bogus"}, nil, 1, "", "pacenotch: unknown option: --bogus (try --help)\n"},
 		{"help", []string{"-h"}, nil, 0, "The notch ┃ marks an even pace", ""},
+		{"gui in the CLI-only build", []string{"gui"}, nil, 1, "", "pacenotch: this is the CLI-only build; `pacenotch gui` needs the GUI build\n"},
 		{"raw", []string{"--raw", "--from", "-"}, []byte(`{"a":1}`), 0, "{\n  \"a\": 1\n}\n", ""},
 		{"ascii", []string{"--ascii", "--from", "-", "--width", "60", "--color", "never"}, fx["api-sample"], 2, "#####|", ""},
 	}
