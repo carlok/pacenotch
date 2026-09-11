@@ -161,6 +161,41 @@ func TestThemeChoice(t *testing.T) {
 	}
 }
 
+func TestCompactWindow(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	u.Start()
+	u.Show(sampleView(t))
+	if u.Compact() {
+		t.Fatal("compact is off by default")
+	}
+	u.SetCompact(true)
+	u.SetCompact(true) // no-op
+	all := strings.Join(texts(u.Window.Content()), "\n")
+	for _, want := range []string{"data 12s old", "5h", "33%/50% -17 ▼", "7d", "72%/63% +9 ▲", "7d S", "0% idle ○"} {
+		if !strings.Contains(all, want) {
+			t.Errorf("compact window is missing %q in\n%s", want, all)
+		}
+	}
+	if strings.Contains(all, "budget") || strings.Contains(all, "resets in") {
+		t.Errorf("compact window must not show the detail lines:\n%s", all)
+	}
+	if !a.Preferences().Bool(prefCompact) || u.Window.Canvas().Size().Width > windowSize(false).Width {
+		t.Error("the choice is saved and the window shrinks")
+	}
+	for _, it := range u.Menu().Items {
+		if it.Label == "Compact window" {
+			if !it.Checked {
+				t.Error("the menu item must be checked")
+			}
+			it.Action()
+		}
+	}
+	if u.Compact() || !strings.Contains(strings.Join(texts(u.Window.Content()), "\n"), "budget") {
+		t.Error("the menu item must switch back to the full view")
+	}
+}
+
 func TestAboutWindow(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "v9")

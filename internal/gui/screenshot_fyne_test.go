@@ -46,6 +46,9 @@ func TestScreenshots(t *testing.T) {
 		}
 		u.Show(v)
 		capture(t, u.Window, fyne.NewSize(620, 400), filepath.Join(dir, "window-"+name+".png"))
+		u.SetCompact(true)
+		capture(t, u.Window, windowSize(true), filepath.Join(dir, "window-compact-"+name+".png"))
+		u.SetCompact(false)
 		u.ShowAbout()
 		capture(t, u.about, fyne.NewSize(480, 380), filepath.Join(dir, "about-"+name+".png"))
 

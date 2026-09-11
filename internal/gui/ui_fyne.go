@@ -25,7 +25,16 @@ const (
 	prefTheme   = "theme"
 	ThemeDark   = "dark"
 	ThemeSystem = "system"
+	prefCompact = "compact"
 )
+
+// windowSize is the window size for the full and the compact view.
+func windowSize(compact bool) fyne.Size {
+	if compact {
+		return fyne.NewSize(460, 230)
+	}
+	return fyne.NewSize(600, 460)
+}
 
 // UI is the Fyne glue: it only turns Views into widgets, the tray menu and the tray icon.
 type UI struct {
@@ -45,7 +54,7 @@ func NewUI(a fyne.App, version string) *UI {
 	u.applyTheme()
 	u.Window = a.NewWindow("pacenotch")
 	u.Window.SetCloseIntercept(u.Window.Hide) // closing the window leaves the tray running
-	u.Window.Resize(fyne.NewSize(600, 460))
+	u.Window.Resize(windowSize(u.Compact()))
 	a.Settings().AddListener(func(fyne.Settings) { u.render() }) // follow OS light/dark changes
 	return u
 }
@@ -88,6 +97,21 @@ func (u *UI) SetThemeChoice(choice string) {
 	}
 	u.App.Preferences().SetString(prefTheme, choice)
 	u.applyTheme()
+	u.render()
+}
+
+// Compact reports whether the window shows one line per window (saved, off by default).
+func (u *UI) Compact() bool {
+	return u.App.Preferences().BoolWithFallback(prefCompact, false)
+}
+
+// SetCompact saves the compact choice, resizes the window to fit and redraws.
+func (u *UI) SetCompact(on bool) {
+	if on == u.Compact() {
+		return
+	}
+	u.App.Preferences().SetBool(prefCompact, on)
+	u.Window.Resize(windowSize(on))
 	u.render()
 }
 
@@ -141,11 +165,14 @@ func (u *UI) Menu() *fyne.Menu {
 	dark.Checked, system.Checked = u.ThemeChoice() == ThemeDark, u.ThemeChoice() == ThemeSystem
 	appearance := fyne.NewMenuItem("Appearance", nil)
 	appearance.ChildMenu = fyne.NewMenu("", dark, system)
+	compact := fyne.NewMenuItem("Compact window", func() { u.SetCompact(!u.Compact()) })
+	compact.Checked = u.Compact()
 	quit := fyne.NewMenuItem("Quit", u.App.Quit)
 	quit.IsQuit = true
 	items = append(items, fyne.NewMenuItemSeparator(),
 		fyne.NewMenuItem("Open window", u.ShowWindow),
 		fyne.NewMenuItem("Refresh now", u.refresh),
+		compact,
 		appearance,
 		fyne.NewMenuItem("About pacenotch", u.ShowAbout),
 		fyne.NewMenuItemSeparator(), quit)
@@ -178,6 +205,14 @@ func (u *UI) content() fyne.CanvasObject {
 		body.Add(styled(tui.NoWindows, th.Dim, false))
 	}
 	for _, r := range v.Rows {
+		if u.Compact() {
+			// fixed-width columns on both sides, so every bar has the same length
+			label := container.NewGridWrap(fyne.NewSize(44, 22), styled(r.Short, th.Text, true))
+			tail := styled(r.Compact, th.Fill[r.Row.Class], false)
+			tail.Alignment = fyne.TextAlignTrailing
+			body.Add(container.NewBorder(nil, nil, label, container.NewGridWrap(fyne.NewSize(124, 22), tail), Bar(r.Row, th)))
+			continue
+		}
 		title := container.NewHBox(styled(r.Title, th.Text, true), styled(r.Status, th.Fill[r.Row.Class], false))
 		body.Add(container.NewBorder(nil, nil, title, styled(r.Resets, th.Dim, false)))
 		body.Add(Bar(r.Row, th))
@@ -207,10 +242,19 @@ func (u *UI) content() fyne.CanvasObject {
 			u.SetThemeChoice(ThemeSystem)
 		}
 	}
+	compact := widget.NewCheck("Compact", nil)
+	compact.SetChecked(u.Compact())
+	compact.OnChanged = u.SetCompact
 	footer := container.NewHBox(
 		widget.NewButtonWithIcon("Refresh now", theme.ViewRefreshIcon(), u.refresh),
-		layout.NewSpacer(), widget.NewLabel("Appearance"), choice,
+		layout.NewSpacer(), compact, widget.NewLabel("Appearance"), choice,
 		widget.NewButtonWithIcon("About", theme.InfoIcon(), u.ShowAbout))
+	if u.Compact() { // icon-only buttons, so the footer fits the narrow window
+		footer = container.NewHBox(
+			widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), u.refresh),
+			layout.NewSpacer(), compact, choice,
+			widget.NewButtonWithIcon("", theme.InfoIcon(), u.ShowAbout))
+	}
 	return container.NewBorder(container.NewPadded(header), container.NewPadded(footer), nil, nil,
 		container.NewVScroll(container.NewPadded(body)))
 }

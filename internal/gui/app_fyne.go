@@ -45,6 +45,9 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	a := app.NewWithID(AppID)
 	a.SetIcon(fyne.NewStaticResource("pacenotch.png", EncodePNG(AppIcon(256))))
 	ui := NewUI(a, version)
+	if opts.Compact {
+		ui.SetCompact(true) // -c turns the saved switch on
+	}
 	ctrl := &Controller{Load: loader.Load, Now: now, Band: opts.Band, Publish: ui.Publish}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }
 	setReopenHandler(func() { fyne.Do(ui.ShowWindow) }) // opened again while running

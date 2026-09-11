@@ -31,13 +31,13 @@ func TestBuildViewRows(t *testing.T) {
 		t.Fatalf("view %+v", v)
 	}
 	want := []RowView{
-		{Title: "5h session", Status: "33% used  pace 50%  (-17)  ▼ room to spare", Resets: "resets in 2h 30m",
+		{Title: "5h session", Short: "5h", Compact: "33%/50% -17 ▼", Status: "33% used  pace 50%  (-17)  ▼ room to spare", Resets: "resets in 2h 30m",
 			Budget: "budget 26.8%/h for 2h 30m (flat pace 20.0%/h)", Projection: "at this rate: ~66% at reset", ProjTone: ToneDim,
 			Menu: "5h  33% / pace 50%  ▼ room to spare  · resets 2h 30m"},
-		{Title: "7d all models", Status: "72% used  pace 63%  (+9)  ▲ slow down", Resets: "resets in 2d 13h",
+		{Title: "7d all models", Short: "7d", Compact: "72%/63% +9 ▲", Status: "72% used  pace 63%  (+9)  ▲ slow down", Resets: "resets in 2d 13h",
 			Budget: "budget 10.9%/day for 2d 13h (flat pace 14.3%/day)", Projection: "at this rate: limit in 1d 17h, 20h 4m before reset",
 			ProjTone: ToneAlert, Menu: "7d  72% / pace 63%  ▲ slow down  · resets 2d 13h"},
-		{Title: "7d Sonnet", Status: "0% used  ○ not started", Resets: "starts with your next message",
+		{Title: "7d Sonnet", Short: "7d S", Compact: "0% idle ○", Status: "0% used  ○ not started", Resets: "starts with your next message",
 			Budget: "full budget available, no active window", ProjTone: ToneDim, Menu: "7d S  0%  ○ not started"},
 	}
 	for i, w := range want {
@@ -124,8 +124,8 @@ func TestAheadNotifier(t *testing.T) {
 }
 
 func TestParseArgs(t *testing.T) {
-	o, err := ParseArgs([]string{"-b", "3", "--ttl", "60", "--from", "x.json"})
-	if err != nil || o.Band != 3 || o.TTL != 60 || o.From != "x.json" {
+	o, err := ParseArgs([]string{"-b", "3", "-c", "--ttl", "60", "--from", "x.json"})
+	if err != nil || o.Band != 3 || !o.Compact || o.TTL != 60 || o.From != "x.json" {
 		t.Errorf("%+v %v", o, err)
 	}
 	if o, err = ParseArgs(nil); err != nil || o.TTL != 180 {
@@ -134,8 +134,8 @@ func TestParseArgs(t *testing.T) {
 	if o, err = ParseArgs([]string{"-h"}); err != nil || !o.Help {
 		t.Errorf("help: %+v %v", o, err)
 	}
-	for _, args := range [][]string{{"-w"}, {"-c"}, {"--raw"}, {"--width", "3"}, {"--color", "never"}, {"--ascii"}, {"--version"}} {
-		if _, err := ParseArgs(args); err == nil || err.Error() != "the GUI accepts only -b, --ttl and --from" {
+	for _, args := range [][]string{{"-w"}, {"--raw"}, {"--width", "3"}, {"--color", "never"}, {"--ascii"}, {"--version"}} {
+		if _, err := ParseArgs(args); err == nil || err.Error() != "the GUI accepts only -b, -c, --ttl and --from" {
 			t.Errorf("%v: %v", args, err)
 		}
 	}

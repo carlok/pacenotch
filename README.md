@@ -54,6 +54,10 @@ The window, in the Dark appearance (default) and in System with a light OS theme
 <img src="docs/window-light.png" width="49%" alt="pacenotch window, light">
 </p>
 
+The compact window, one line per window:
+
+<img src="docs/window-compact-dark.png" width="49%" alt="pacenotch compact window, dark">
+
 The tray icon, scaled up 4×: 5-hour bar on top, 7-day below, each with its notch. It is
 2:1 in the macOS menu bar and square on Windows and Linux; the orange badge means stale
 data or a sign-in problem.
@@ -143,13 +147,15 @@ line script without another API call.
 
 ### GUI
 
-`pacenotch gui [-b N] [--ttl SECS] [--from FILE]`, or open `pacenotch.app`, or run
+`pacenotch gui [-b N] [-c] [--ttl SECS] [--from FILE]`, or open `pacenotch.app`, or run
 `pacenotch-gui_windows_amd64.exe`.
 
 - The **tray menu** has one line per window, like `7d  72% / pace 63%  ▲ slow down  · resets 2d 13h`,
-  then *Open window*, *Refresh now*, *Appearance* (Dark or System), *About* and *Quit*.
-- The **window** shows the full view with bars that stretch with it. Closing it leaves the
-  tray running.
+  then *Open window*, *Refresh now*, *Compact window*, *Appearance* (Dark or System),
+  *About* and *Quit*.
+- The **window** shows the full view with bars that stretch with it, or the compact view
+  (one line per window: label, bar, `72%/63% +9 ▲`) with the *Compact* switch, the tray
+  menu item or `-c`. The choice is saved. Closing the window leaves the tray running.
 - Everything **redraws every 60 seconds**, so the notch keeps moving; data is fetched only
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.

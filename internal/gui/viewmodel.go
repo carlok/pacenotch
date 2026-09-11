@@ -26,6 +26,8 @@ const (
 type RowView struct {
 	Row        pace.Row
 	Title      string // "7d all models"
+	Short      string // "7d"
+	Compact    string // compact window line after the bar: "72%/63% +9 ▲"
 	Status     string // "72% used  pace 63%  (+9)  ▲ slow down"
 	Resets     string // "resets in 2d 13h"
 	Budget     string // "budget 10.9%/day for 2d 13h (flat pace 14.3%/day)"
@@ -106,8 +108,9 @@ func age(s int64) string {
 
 func rowView(r pace.Row) RowView {
 	glyph, word := pace.Status(r.Class)
-	rv := RowView{Row: r, Title: r.Label, ProjTone: ToneDim}
+	rv := RowView{Row: r, Title: r.Label, Short: r.Short, ProjTone: ToneDim}
 	if r.Class == pace.Idle {
+		rv.Compact = fmt.Sprintf("%d%% idle %s", r.Used, glyph)
 		rv.Status = fmt.Sprintf("%d%% used  %s %s", r.Used, glyph, word)
 		rv.Resets = "starts with your next message"
 		rv.Budget = "full budget available, no active window"
@@ -119,6 +122,7 @@ func rowView(r pace.Row) RowView {
 		sd = "+" + sd
 	}
 	left := pace.Duration(r.Left)
+	rv.Compact = fmt.Sprintf("%d%%/%d%% %s %s", r.Used, r.Exp, sd, glyph)
 	rv.Status = fmt.Sprintf("%d%% used  pace %d%%  (%s)  %s %s", r.Used, r.Exp, sd, glyph, word)
 	rv.Resets = "resets in " + left
 	rv.Budget = fmt.Sprintf("budget %s%%/%s for %s (flat pace %s%%/%s)", r.Budget, r.Unit, left, r.Flat, r.Unit)
@@ -160,7 +164,7 @@ func (n *AheadNotifier) Update(v View) bool {
 	return fire
 }
 
-// ParseArgs accepts the GUI flags: -b, --ttl (default 180) and --from.
+// ParseArgs accepts the GUI flags: -b, -c, --ttl (default 180) and --from.
 func ParseArgs(args []string) (tui.Options, error) {
 	o, err := tui.ParseArgs(args, 180)
 	if err != nil {
@@ -170,9 +174,9 @@ func ParseArgs(args []string) (tui.Options, error) {
 	if o.Help {
 		return o, nil
 	}
-	if o.Compact != def.Compact || o.Watch != def.Watch || o.Interval != def.Interval || o.Width != def.Width ||
+	if o.Watch != def.Watch || o.Interval != def.Interval || o.Width != def.Width ||
 		o.Raw != def.Raw || o.Color != def.Color || o.ASCII != def.ASCII || o.Version != def.Version {
-		return o, errors.New("the GUI accepts only -b, --ttl and --from")
+		return o, errors.New("the GUI accepts only -b, -c, --ttl and --from")
 	}
 	return o, nil
 }
@@ -181,6 +185,7 @@ func ParseArgs(args []string) (tui.Options, error) {
 const Help = `pacenotch gui: tray icon and window with the vertical pace notch
 
   -b N         "on pace" band in points (default 5)
+  -c           compact window: one line per window (also a switch in the window and tray menu)
   --ttl SECS   cache time before fetching again (default 180)
   --from FILE  read JSON from FILE instead of the API
 `
