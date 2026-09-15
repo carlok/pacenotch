@@ -18,6 +18,7 @@ import (
 
 	"github.com/carlok/pacenotch/internal/pace"
 	"github.com/carlok/pacenotch/internal/tui"
+	"github.com/carlok/pacenotch/internal/update"
 )
 
 // QuitShortcut is Cmd-Q on macOS and Ctrl-Q elsewhere.
@@ -50,7 +51,20 @@ type UI struct {
 	notifier    AheadNotifier
 	about       fyne.Window
 	settingsWin fyne.Window
-	loginErr    error // the last failed change of the login item
+	loginErr    error          // the last failed change of the login item
+	update      update.Release // a newer release, when one is known
+}
+
+// SetUpdate shows (or, with an empty release, hides) the "update available" notice.
+func (u *UI) SetUpdate(rel update.Release) {
+	u.update = rel
+	u.render()
+}
+
+func (u *UI) openUpdate() {
+	if link, err := url.Parse(u.update.URL); err == nil {
+		u.App.OpenURL(link)
+	}
 }
 
 // NewUI creates the main window (hidden) and applies the saved settings.
@@ -200,6 +214,9 @@ func (u *UI) Menu() *fyne.Menu {
 	for _, r := range u.view.Rows {
 		items = append(items, fyne.NewMenuItem(r.Menu, u.ShowWindow))
 	}
+	if text := UpdateText(u.update); text != "" {
+		items = append(items, fyne.NewMenuItemSeparator(), fyne.NewMenuItem(text, u.openUpdate))
+	}
 	compact := fyne.NewMenuItem("Compact window", func() { u.SetCompact(!u.Compact()) })
 	compact.Checked = u.Compact()
 	quit := fyne.NewMenuItem("Quit", u.App.Quit)
@@ -327,25 +344,31 @@ func tone(t Tone, th BarTheme) color.Color {
 // ShowAbout opens the About / credits window.
 func (u *UI) ShowAbout() {
 	if u.about == nil {
-		th := Bars(u.Dark())
-		lines := AboutLines(u.Version)
-		repo, _ := url.Parse(RepoURL)
-		issues, _ := url.Parse(IssuesURL)
-		sample := pace.Row{Class: pace.Ahead, UsedBP: 7200, ExpBP: 6339}
 		u.about = u.App.NewWindow("About pacenotch")
 		u.about.SetCloseIntercept(u.about.Hide)
-		u.about.SetContent(container.NewPadded(container.NewVBox(
-			styled(lines[0], th.Text, true),
-			styled(lines[1], th.Dim, false),
-			Bar(sample, th),
-			paragraph(lines[2], th.Text),
-			paragraph(lines[3], tone(ToneWarn, th)),
-			container.NewHBox(widget.NewHyperlink("github.com/carlok/pacenotch", repo), widget.NewHyperlink("Report an issue", issues)),
-			paragraph(lines[4], th.Dim),
-			styled(lines[5], th.Dim, false),
-		)))
-		u.about.Resize(fyne.NewSize(480, 380))
+		u.about.Resize(fyne.NewSize(480, 400))
 	}
+	th := Bars(u.Dark())
+	lines := AboutLines(u.Version)
+	repo, _ := url.Parse(RepoURL)
+	issues, _ := url.Parse(IssuesURL)
+	sample := pace.Row{Class: pace.Ahead, UsedBP: 7200, ExpBP: 6339}
+	box := container.NewVBox(
+		styled(lines[0], th.Text, true),
+		styled(lines[1], th.Dim, false),
+		Bar(sample, th),
+		paragraph(lines[2], th.Text),
+		paragraph(lines[3], tone(ToneWarn, th)),
+		container.NewHBox(widget.NewHyperlink("github.com/carlok/pacenotch", repo), widget.NewHyperlink("Report an issue", issues)),
+		paragraph(lines[4], th.Dim),
+		styled(lines[5], th.Dim, false),
+	)
+	if text := UpdateText(u.update); text != "" {
+		if link, err := url.Parse(u.update.URL); err == nil {
+			box.Add(widget.NewHyperlink(text, link))
+		}
+	}
+	u.about.SetContent(container.NewPadded(box))
 	u.about.Show()
 	u.about.RequestFocus()
 	bringToFront()

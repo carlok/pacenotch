@@ -17,6 +17,7 @@ import (
 	"github.com/carlok/pacenotch/internal/claudecli"
 	"github.com/carlok/pacenotch/internal/instance"
 	"github.com/carlok/pacenotch/internal/tui"
+	"github.com/carlok/pacenotch/internal/update"
 	"github.com/carlok/pacenotch/internal/usage"
 )
 
@@ -94,7 +95,22 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	}
 	setRefresh(settings.RefreshToken)
 	ctrl := &Controller{Load: loader.Load, Now: now, Band: settings.Band, Publish: ui.Publish}
+	var checkUpdates atomic.Bool
+	checkUpdates.Store(settings.CheckUpdates)
+	updater := &Updater{
+		Check: update.NewChecker().Latest, Store: a.Preferences(), Now: time.Now, Version: version,
+		Enabled: checkUpdates.Load,
+		OnFound: func(rel update.Release) { fyne.Do(func() { ui.SetUpdate(rel) }) },
+	}
 	ui.OnSettings = func(before, after Settings) {
+		if after.CheckUpdates != before.CheckUpdates {
+			checkUpdates.Store(after.CheckUpdates)
+			if after.CheckUpdates {
+				go updater.Tick(ctx)
+			} else {
+				ui.SetUpdate(update.Release{})
+			}
+		}
 		if after.TTL != before.TTL {
 			loader.SetTTL(time.Duration(after.TTL) * time.Second)
 		}
@@ -111,7 +127,8 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	setReopenHandler(show) // opened again while running
 	a.Lifecycle().SetOnStarted(func() {
 		startMacApp(ui.ShowInDock())
-		go ctrl.Run(ctx, time.Minute, time.After) // redraw every 60 s, fetch per TTL
+		go ctrl.Run(ctx, time.Minute, time.After)  // redraw every 60 s, fetch per TTL
+		go updater.Run(ctx, time.Hour, time.After) // at most one GitHub request a day, when enabled
 	})
 	go func() {
 		<-ctx.Done() // Ctrl-C in the launching terminal

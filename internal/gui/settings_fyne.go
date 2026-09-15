@@ -21,6 +21,7 @@ const (
 	LabelDock         = "Dock"
 	LabelRefreshToken = "Expired token"
 	LabelLogin        = "Login"
+	LabelUpdates      = "Updates"
 )
 
 // ShowSettings opens the Settings window. Changes apply and save right away.
@@ -28,7 +29,7 @@ func (u *UI) ShowSettings() {
 	if u.settingsWin == nil {
 		u.settingsWin = u.App.NewWindow("pacenotch settings")
 		u.settingsWin.SetCloseIntercept(u.settingsWin.Hide)
-		u.settingsWin.Resize(fyne.NewSize(500, 480))
+		u.settingsWin.Resize(fyne.NewSize(500, 540))
 	}
 	u.settingsWin.SetContent(u.settingsContent())
 	u.settingsWin.Show()
@@ -111,6 +112,11 @@ func (u *UI) settingsContent() fyne.CanvasObject {
 		Text:     LabelRefreshToken,
 		Widget:   check("Refresh it through Claude Code", s.RefreshToken, func(s *Settings, v bool) { s.RefreshToken = v }),
 		HintText: "runs a tiny claude -p request; pacenotch never writes the token",
+	})
+	form.AppendItem(&widget.FormItem{
+		Text:     LabelUpdates,
+		Widget:   check("Check for a newer release once a day", s.CheckUpdates, func(s *Settings, v bool) { s.CheckUpdates = v }),
+		HintText: "asks GitHub for the latest release; nothing is downloaded",
 	})
 	return container.NewPadded(container.NewVScroll(form))
 }

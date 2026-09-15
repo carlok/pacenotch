@@ -18,6 +18,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
+	"github.com/carlok/pacenotch/internal/update"
 	"github.com/carlok/pacenotch/internal/usage"
 )
 
@@ -375,6 +376,40 @@ func TestLoginItemSetting(t *testing.T) {
 	all := strings.Join(texts(u.settingsWin.Content()), "\n")
 	if fa.on || fa.calls != 3 || !strings.Contains(all, "could not change the login item: permission denied") {
 		t.Errorf("failed enable: %+v\n%s", fa, all)
+	}
+}
+
+func TestUpdateNotice(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "v0.3.0")
+	u.Show(sampleView(t))
+	u.ShowSettings()
+	test.Tap(formWidget(u.settingsWin.Content(), LabelUpdates).(*widget.Check))
+	if !u.Settings.Effective().CheckUpdates || !a.Preferences().Bool(PrefCheckUpdates) {
+		t.Error("the update check setting must be saved")
+	}
+
+	rel := update.Release{Tag: "v0.4.0", URL: update.ReleasesPrefix + "tag/v0.4.0"}
+	u.SetUpdate(rel)
+	var item *fyne.MenuItem
+	for _, it := range u.Menu().Items {
+		if it.Label == "Update available: v0.4.0" {
+			item = it
+		}
+	}
+	if item == nil {
+		t.Fatal("the tray menu needs the update notice")
+	}
+	item.Action() // opens the release page through the (test) app
+	u.ShowAbout()
+	if all := strings.Join(texts(u.about.Content()), "\n"); !strings.Contains(all, "Update available: v0.4.0") {
+		t.Errorf("About is missing the notice:\n%s", all)
+	}
+	u.SetUpdate(update.Release{})
+	for _, it := range u.Menu().Items {
+		if strings.HasPrefix(it.Label, "Update available") {
+			t.Error("the notice must go away")
+		}
 	}
 }
 

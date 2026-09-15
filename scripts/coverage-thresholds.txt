@@ -7,4 +7,5 @@ internal/gui(model+raster)   90  ^internal/gui/                              _fy
 internal/claudecli           90  ^internal/claudecli/
 internal/instance            90  ^internal/instance/
 internal/autostart           90  ^internal/autostart/
+internal/update              90  ^internal/update/
 module(unit+e2e)             85  .

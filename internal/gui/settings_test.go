@@ -42,7 +42,7 @@ func TestLoadAndSaveSettings(t *testing.T) {
 	if got := LoadSettings(mapStore{}); got != DefaultSettings() {
 		t.Errorf("empty store: %+v", got)
 	}
-	want := Settings{Band: 2.5, TTL: 600, Notify: false, Compact: true, Theme: ThemeSystem, ShowInDock: true, RefreshToken: false}
+	want := Settings{Band: 2.5, TTL: 600, Notify: false, Compact: true, Theme: ThemeSystem, ShowInDock: true, RefreshToken: false, CheckUpdates: true}
 	st := mapStore{}
 	SaveSettings(st, want)
 	if got := LoadSettings(st); got != want {

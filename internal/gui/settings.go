@@ -19,6 +19,7 @@ const (
 	PrefBand         = "band"
 	PrefTTL          = "ttl"
 	PrefNotify       = "notify"
+	PrefCheckUpdates = "checkUpdates"
 )
 
 // Appearance values.
@@ -63,6 +64,7 @@ type Settings struct {
 	Theme        string // ThemeDark or ThemeSystem
 	ShowInDock   bool   // macOS
 	RefreshToken bool
+	CheckUpdates bool // ask GitHub once a day for a newer release
 }
 
 // DefaultSettings are used for anything not saved yet.
@@ -94,6 +96,7 @@ func LoadSettings(st Store) Settings {
 		Theme:        st.StringWithFallback(PrefTheme, d.Theme),
 		ShowInDock:   st.BoolWithFallback(PrefShowInDock, d.ShowInDock),
 		RefreshToken: st.BoolWithFallback(PrefRefreshToken, d.RefreshToken),
+		CheckUpdates: st.BoolWithFallback(PrefCheckUpdates, d.CheckUpdates),
 	}
 	if !(s.Band > 0 && s.Band <= MaxBand) {
 		s.Band = d.Band
@@ -116,6 +119,7 @@ func SaveSettings(st Store, s Settings) {
 	st.SetString(PrefTheme, s.Theme)
 	st.SetBool(PrefShowInDock, s.ShowInDock)
 	st.SetBool(PrefRefreshToken, s.RefreshToken)
+	st.SetBool(PrefCheckUpdates, s.CheckUpdates)
 }
 
 // Overrides are command-line flags: they apply to this session and are never saved.
@@ -176,7 +180,8 @@ func (m *SettingsModel) Update(change func(*Settings)) (before, after Settings, 
 	if next.Compact != before.Compact {
 		saved.Compact, o.Compact = next.Compact, false
 	}
-	saved.Notify, saved.Theme, saved.ShowInDock, saved.RefreshToken = next.Notify, next.Theme, next.ShowInDock, next.RefreshToken
+	saved.Notify, saved.Theme, saved.ShowInDock = next.Notify, next.Theme, next.ShowInDock
+	saved.RefreshToken, saved.CheckUpdates = next.RefreshToken, next.CheckUpdates
 	m.saved, m.overrides = saved, o
 	SaveSettings(m.store, saved)
 	return before, m.Effective(), nil
