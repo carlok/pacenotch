@@ -20,6 +20,7 @@ const (
 	LabelTheme        = "Appearance"
 	LabelDock         = "Dock"
 	LabelRefreshToken = "Expired token"
+	LabelLogin        = "Login"
 )
 
 // ShowSettings opens the Settings window. Changes apply and save right away.
@@ -27,7 +28,7 @@ func (u *UI) ShowSettings() {
 	if u.settingsWin == nil {
 		u.settingsWin = u.App.NewWindow("pacenotch settings")
 		u.settingsWin.SetCloseIntercept(u.settingsWin.Hide)
-		u.settingsWin.Resize(fyne.NewSize(500, 420))
+		u.settingsWin.Resize(fyne.NewSize(500, 480))
 	}
 	u.settingsWin.SetContent(u.settingsContent())
 	u.settingsWin.Show()
@@ -84,6 +85,27 @@ func (u *UI) settingsContent() fyne.CanvasObject {
 	)
 	if runtime.GOOS == "darwin" {
 		form.Append(LabelDock, check("Show in Dock and Cmd-Tab", s.ShowInDock, func(s *Settings, v bool) { s.ShowInDock = v }))
+	}
+	if u.Autostart != nil {
+		on, err := u.Autostart.Enabled()
+		login := widget.NewCheck("Start pacenotch when I log in", nil)
+		login.SetChecked(on)
+		login.OnChanged = func(v bool) {
+			if v {
+				u.loginErr = u.Autostart.Enable()
+			} else {
+				u.loginErr = u.Autostart.Disable()
+			}
+			u.settingsWin.SetContent(u.settingsContent())
+		}
+		hint := "adds a login item for this copy of pacenotch"
+		switch {
+		case u.loginErr != nil:
+			hint = "could not change the login item: " + u.loginErr.Error()
+		case err != nil:
+			hint = "cannot read the login item: " + err.Error()
+		}
+		form.AppendItem(&widget.FormItem{Text: LabelLogin, Widget: login, HintText: hint})
 	}
 	form.AppendItem(&widget.FormItem{
 		Text:     LabelRefreshToken,

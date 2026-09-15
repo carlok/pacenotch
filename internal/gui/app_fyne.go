@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
+	"github.com/carlok/pacenotch/internal/autostart"
 	"github.com/carlok/pacenotch/internal/claudecli"
 	"github.com/carlok/pacenotch/internal/instance"
 	"github.com/carlok/pacenotch/internal/tui"
@@ -68,6 +69,11 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	a.SetIcon(fyne.NewStaticResource("pacenotch.png", EncodePNG(AppIcon(256))))
 	ui := NewUI(a, version)
 	ui.ApplyOverrides(overrides)
+	login := autostart.Default()
+	ui.Autostart = login
+	if on, _ := login.Enabled(); on {
+		login.Repair() // the app may have moved since the login item was written
+	}
 	settings := ui.Settings.Effective()
 	loader.SetTTL(time.Duration(settings.TTL) * time.Second)
 

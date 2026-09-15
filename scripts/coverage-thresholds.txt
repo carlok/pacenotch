@@ -6,4 +6,5 @@ internal/tui                 90  ^internal/tui/
 internal/gui(model+raster)   90  ^internal/gui/                              _fyne\.go$
 internal/claudecli           90  ^internal/claudecli/
 internal/instance            90  ^internal/instance/
+internal/autostart           90  ^internal/autostart/
 module(unit+e2e)             85  .

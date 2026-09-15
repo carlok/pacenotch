@@ -4,6 +4,7 @@ package gui
 
 import (
 	"context"
+	"errors"
 	"runtime"
 	"strings"
 	"sync/atomic"
@@ -328,6 +329,52 @@ func TestSettingsWindow(t *testing.T) {
 	u.ShowSettings()
 	if all = strings.Join(texts(u.settingsWin.Content()), "\n"); !strings.Contains(all, "set by -b for this session") || u.Settings.Effective().Band != 3 {
 		t.Errorf("override hint missing:\n%s", all)
+	}
+}
+
+type fakeAutostart struct {
+	on    bool
+	err   error
+	calls int
+}
+
+func (f *fakeAutostart) Enabled() (bool, error) { return f.on, nil }
+
+func (f *fakeAutostart) Enable() error {
+	f.calls++
+	if f.err != nil {
+		return f.err
+	}
+	f.on = true
+	return nil
+}
+
+func (f *fakeAutostart) Disable() error {
+	f.calls++
+	f.on = false
+	return nil
+}
+
+func TestLoginItemSetting(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	u.ShowSettings()
+	if formWidget(u.settingsWin.Content(), LabelLogin) != nil {
+		t.Error("no login setting without autostart support")
+	}
+	fa := &fakeAutostart{}
+	u.Autostart = fa
+	u.ShowSettings()
+	test.Tap(formWidget(u.settingsWin.Content(), LabelLogin).(*widget.Check))
+	if !fa.on || fa.calls != 1 {
+		t.Fatalf("enable: %+v", fa)
+	}
+	test.Tap(formWidget(u.settingsWin.Content(), LabelLogin).(*widget.Check))
+	fa.err = errors.New("permission denied")
+	test.Tap(formWidget(u.settingsWin.Content(), LabelLogin).(*widget.Check))
+	all := strings.Join(texts(u.settingsWin.Content()), "\n")
+	if fa.on || fa.calls != 3 || !strings.Contains(all, "could not change the login item: permission denied") {
+		t.Errorf("failed enable: %+v\n%s", fa, all)
 	}
 }
 

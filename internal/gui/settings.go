@@ -46,6 +46,14 @@ type Store interface {
 	SetString(key, value string)
 }
 
+// Autostart turns start-at-login on and off (see internal/autostart). It is not a saved
+// preference: the OS login entry is the source of truth.
+type Autostart interface {
+	Enabled() (bool, error)
+	Enable() error
+	Disable() error
+}
+
 // Settings are the GUI preferences.
 type Settings struct {
 	Band         float64 // "on pace" band in points

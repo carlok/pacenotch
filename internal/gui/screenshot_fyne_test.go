@@ -39,6 +39,7 @@ func TestScreenshots(t *testing.T) {
 	for _, name := range []string{"dark", "light"} {
 		a := test.NewTempApp(t)
 		u := NewUI(a, "v0.1.0")
+		u.Autostart = &fakeAutostart{on: true}
 		if name == "light" {
 			// "System" with the OS in light mode; the test driver has no OS variant of its own
 			u.SetThemeChoice(ThemeSystem)
@@ -52,7 +53,7 @@ func TestScreenshots(t *testing.T) {
 		u.ShowAbout()
 		capture(t, u.about, fyne.NewSize(480, 380), filepath.Join(dir, "about-"+name+".png"))
 		u.ShowSettings()
-		capture(t, u.settingsWin, fyne.NewSize(520, 440), filepath.Join(dir, "settings-"+name+".png"))
+		capture(t, u.settingsWin, fyne.NewSize(520, 500), filepath.Join(dir, "settings-"+name+".png"))
 
 		dark := name == "dark"
 		menubar := rgb(0xF2F2F2)

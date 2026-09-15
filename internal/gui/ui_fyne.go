@@ -38,8 +38,9 @@ type UI struct {
 	Window    fyne.Window
 	Version   string
 	Settings  *SettingsModel
-	OnRefresh func() // "Refresh now"
-	Quit      func() // the window's Quit button and Cmd/Ctrl-Q; App.Quit by default
+	Autostart Autostart // start at login; nil hides the setting
+	OnRefresh func()    // "Refresh now"
+	Quit      func()    // the window's Quit button and Cmd/Ctrl-Q; App.Quit by default
 
 	// OnSettings is called after the settings changed, with the effective values before and
 	// after, so the app can apply the band, the TTL, token refresh and so on.
@@ -49,6 +50,7 @@ type UI struct {
 	notifier    AheadNotifier
 	about       fyne.Window
 	settingsWin fyne.Window
+	loginErr    error // the last failed change of the login item
 }
 
 // NewUI creates the main window (hidden) and applies the saved settings.

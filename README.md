@@ -160,8 +160,8 @@ line script without another API call.
   (one line per window: label, bar, `72%/63% +9 ▲`). Closing it leaves the tray running.
 - **Settings** (button in the window, tray menu, and pacenotch → Settings… on macOS) apply
   and save right away: the on-pace band, how often data is refreshed, notifications,
-  compact window, appearance (Dark or System), *Show in Dock and Cmd-Tab* (macOS) and
-  *Refresh expired token through Claude Code*.
+  compact window, appearance (Dark or System), *Show in Dock and Cmd-Tab* (macOS),
+  *Refresh expired token through Claude Code* and *Start pacenotch when I log in*.
 - Everything **redraws every 60 seconds**, so the notch keeps moving; data is fetched only
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.
@@ -184,6 +184,12 @@ xattr -d com.apple.quarantine pacenotch.app
 (or the binary you downloaded). pacenotch reads the token with
 `security find-generic-password -s "Claude Code-credentials" -w`; macOS may ask you to allow
 it the first time.
+
+**Start at login** writes the OS's own entry, for the copy of pacenotch you enabled it
+from (moving the app updates it at the next launch): `~/Library/LaunchAgents/io.github.carlok.pacenotch.plist`
+on macOS (listed in System Settings → General → Login Items), `~/.config/autostart/pacenotch.desktop`
+on Linux, and the `pacenotch` value under `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run`
+on Windows. Turning the setting off removes it.
 
 **Ubuntu.** The tray icon uses AppIndicator, which Ubuntu enables by default. On a GNOME
 desktop without it, install the *AppIndicator and KStatusNotifierItem Support* extension.
