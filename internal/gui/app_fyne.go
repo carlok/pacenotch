@@ -52,7 +52,7 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }
 	setReopenHandler(func() { fyne.Do(ui.ShowWindow) }) // opened again while running
 	a.Lifecycle().SetOnStarted(func() {
-		hideDockIcon()
+		startMacApp(ui.ShowInDock())
 		go ctrl.Run(ctx, time.Minute, time.After) // redraw every 60 s, fetch per TTL
 	})
 	go func() {

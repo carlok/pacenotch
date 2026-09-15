@@ -2,8 +2,11 @@
 
 package gui
 
-// hideDockIcon: only macOS has a Dock icon to hide.
-func hideDockIcon() {}
+// startMacApp: only macOS has a Dock and menu-bar-only apps.
+func startMacApp(bool) {}
+
+// setDockVisible: only macOS has a Dock mode.
+func setDockVisible(bool) {}
 
 // bringToFront: Window.RequestFocus is enough outside macOS.
 func bringToFront() {}

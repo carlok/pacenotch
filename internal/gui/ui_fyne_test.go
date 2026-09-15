@@ -4,6 +4,7 @@ package gui
 
 import (
 	"context"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/test"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/carlok/pacenotch/internal/usage"
@@ -193,6 +195,75 @@ func TestCompactWindow(t *testing.T) {
 	}
 	if u.Compact() || !strings.Contains(strings.Join(texts(u.Window.Content()), "\n"), "budget") {
 		t.Error("the menu item must switch back to the full view")
+	}
+}
+
+func findIconButton(o fyne.CanvasObject, icon string) *widget.Button {
+	switch x := o.(type) {
+	case *widget.Button:
+		if x.Text == "" && x.Icon != nil && x.Icon.Name() == icon {
+			return x
+		}
+	case *container.Scroll:
+		return findIconButton(x.Content, icon)
+	case *fyne.Container:
+		for _, c := range x.Objects {
+			if b := findIconButton(c, icon); b != nil {
+				return b
+			}
+		}
+	}
+	return nil
+}
+
+func TestQuitAndDockMode(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	quits := 0
+	u.Quit = func() { quits++ }
+	u.Start()
+	u.Show(sampleView(t))
+
+	want := 1
+	test.Tap(findButton(u.Window.Content(), "Quit"))
+	if sc, ok := u.Window.Canvas().(interface{ TypedShortcut(fyne.Shortcut) }); ok {
+		sc.TypedShortcut(QuitShortcut) // the test canvas has no shortcut dispatch; the real one does
+		want++
+	}
+	u.SetCompact(true)
+	quitIcon := findIconButton(u.Window.Content(), theme.CancelIcon().Name())
+	if quitIcon == nil {
+		t.Fatal("the compact footer needs an icon-only Quit button")
+	}
+	test.Tap(quitIcon)
+	if want++; quits != want {
+		t.Errorf("quit called %d times, want %d", quits, want)
+	}
+
+	var dock *fyne.MenuItem
+	for _, it := range u.Menu().Items {
+		if it.Label == "Show in Dock and Cmd-Tab" {
+			dock = it
+		}
+	}
+	if runtime.GOOS != "darwin" {
+		if dock != nil {
+			t.Error("the Dock mode item is macOS only")
+		}
+		return
+	}
+	if dock == nil || dock.Checked || u.ShowInDock() {
+		t.Fatalf("Dock mode must be off by default: %+v", dock)
+	}
+	dock.Action()
+	u.SetShowInDock(true) // no-op
+	if !u.ShowInDock() || !a.Preferences().Bool(PrefShowInDock) {
+		t.Error("the Dock mode choice must be saved")
+	}
+	for _, it := range u.Menu().Items {
+		if it.Label == "Show in Dock and Cmd-Tab" && !it.Checked {
+			t.Error("the Dock mode item must be checked")
+		}
 	}
 }
 

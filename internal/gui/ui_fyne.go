@@ -28,6 +28,9 @@ const (
 	prefCompact = "compact"
 )
 
+// QuitShortcut is Cmd-Q on macOS and Ctrl-Q elsewhere.
+var QuitShortcut = &desktop.CustomShortcut{KeyName: fyne.KeyQ, Modifier: fyne.KeyModifierShortcutDefault}
+
 // windowSize is the window size for the full and the compact view.
 func windowSize(compact bool) fyne.Size {
 	if compact {
@@ -42,6 +45,7 @@ type UI struct {
 	Window    fyne.Window
 	Version   string
 	OnRefresh func() // "Refresh now"
+	Quit      func() // the window's Quit button and Cmd/Ctrl-Q; App.Quit by default
 
 	view     View
 	notifier AheadNotifier
@@ -50,11 +54,13 @@ type UI struct {
 
 // NewUI creates the main window (hidden) and applies the saved theme choice.
 func NewUI(a fyne.App, version string) *UI {
-	u := &UI{App: a, Version: version, view: Loading}
+	u := &UI{App: a, Version: version, view: Loading, Quit: a.Quit}
 	u.applyTheme()
 	u.Window = a.NewWindow("pacenotch")
 	u.Window.SetCloseIntercept(u.Window.Hide) // closing the window leaves the tray running
 	u.Window.Resize(windowSize(u.Compact()))
+	// Cmd-Q on macOS, Ctrl-Q elsewhere: quits even when the menu bar icon is hidden
+	u.Window.Canvas().AddShortcut(QuitShortcut, func(fyne.Shortcut) { u.Quit() })
 	a.Settings().AddListener(func(fyne.Settings) { u.render() }) // follow OS light/dark changes
 	return u
 }
@@ -115,6 +121,22 @@ func (u *UI) SetCompact(on bool) {
 	u.render()
 }
 
+// ShowInDock reports whether pacenotch shows in the Dock and Cmd-Tab (macOS; saved, off by
+// default).
+func (u *UI) ShowInDock() bool {
+	return u.App.Preferences().BoolWithFallback(PrefShowInDock, false)
+}
+
+// SetShowInDock saves the Dock mode and applies it right away.
+func (u *UI) SetShowInDock(on bool) {
+	if on == u.ShowInDock() {
+		return
+	}
+	u.App.Preferences().SetBool(PrefShowInDock, on)
+	setDockVisible(on)
+	u.render()
+}
+
 func (u *UI) applyTheme() {
 	if u.ThemeChoice() == ThemeDark {
 		u.App.Settings().SetTheme(forcedVariant{theme.DefaultTheme(), theme.VariantDark})
@@ -172,7 +194,13 @@ func (u *UI) Menu() *fyne.Menu {
 	items = append(items, fyne.NewMenuItemSeparator(),
 		fyne.NewMenuItem("Open window", u.ShowWindow),
 		fyne.NewMenuItem("Refresh now", u.refresh),
-		compact,
+		compact)
+	if runtime.GOOS == "darwin" {
+		dock := fyne.NewMenuItem("Show in Dock and Cmd-Tab", func() { u.SetShowInDock(!u.ShowInDock()) })
+		dock.Checked = u.ShowInDock()
+		items = append(items, dock)
+	}
+	items = append(items,
 		appearance,
 		fyne.NewMenuItem("About pacenotch", u.ShowAbout),
 		fyne.NewMenuItemSeparator(), quit)
@@ -245,15 +273,18 @@ func (u *UI) content() fyne.CanvasObject {
 	compact := widget.NewCheck("Compact", nil)
 	compact.SetChecked(u.Compact())
 	compact.OnChanged = u.SetCompact
+	quit := func() { u.Quit() }
 	footer := container.NewHBox(
 		widget.NewButtonWithIcon("Refresh now", theme.ViewRefreshIcon(), u.refresh),
-		layout.NewSpacer(), compact, widget.NewLabel("Appearance"), choice,
-		widget.NewButtonWithIcon("About", theme.InfoIcon(), u.ShowAbout))
+		layout.NewSpacer(), compact, choice,
+		widget.NewButtonWithIcon("About", theme.InfoIcon(), u.ShowAbout),
+		widget.NewButtonWithIcon("Quit", theme.CancelIcon(), quit))
 	if u.Compact() { // icon-only buttons, so the footer fits the narrow window
 		footer = container.NewHBox(
 			widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), u.refresh),
 			layout.NewSpacer(), compact, choice,
-			widget.NewButtonWithIcon("", theme.InfoIcon(), u.ShowAbout))
+			widget.NewButtonWithIcon("", theme.InfoIcon(), u.ShowAbout),
+			widget.NewButtonWithIcon("", theme.CancelIcon(), quit))
 	}
 	return container.NewBorder(container.NewPadded(header), container.NewPadded(footer), nil, nil,
 		container.NewVScroll(container.NewPadded(body)))
