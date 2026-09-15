@@ -166,6 +166,8 @@ line script without another API call.
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.
 - **Quit** is in the window too (button, or Cmd-Q / Ctrl-Q), not only in the tray menu.
+- **One at a time:** starting pacenotch again while it runs (from a terminal, a login item or
+  the app) shows the running window instead of opening a second copy.
 - **macOS, Show in Dock and Cmd-Tab** (Settings): on a MacBook the camera notch can hide
   menu bar icons. With this setting pacenotch behaves like a regular app: Dock icon,
   Cmd-Tab, the app menu with Quit, and a click on the Dock icon reopens the window.

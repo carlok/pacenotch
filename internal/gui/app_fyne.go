@@ -7,12 +7,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
 	"github.com/carlok/pacenotch/internal/claudecli"
+	"github.com/carlok/pacenotch/internal/instance"
 	"github.com/carlok/pacenotch/internal/tui"
 	"github.com/carlok/pacenotch/internal/usage"
 )
@@ -40,6 +42,25 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 		return fail(err)
 	}
 	loader.Backoff = true
+
+	// one GUI at a time: a second launch shows the running window and exits
+	var showWindow atomic.Pointer[func()]
+	if cache, err := os.UserCacheDir(); err == nil && opts.From == "" {
+		lock, first, err := instance.Acquire(instance.SocketPath(cache, os.TempDir()), func() {
+			if f := showWindow.Load(); f != nil {
+				(*f)()
+			}
+		})
+		switch {
+		case err != nil:
+			fmt.Fprintf(stderr, "pacenotch: %v; starting anyway\n", err)
+		case !first:
+			fmt.Fprintln(stdout, "pacenotch is already running: showing its window")
+			return 0
+		default:
+			defer lock.Close()
+		}
+	}
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -79,7 +100,9 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 		}
 	}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }
-	setReopenHandler(func() { fyne.Do(ui.ShowWindow) }) // opened again while running
+	show := func() { fyne.Do(ui.ShowWindow) }
+	showWindow.Store(&show)
+	setReopenHandler(show) // opened again while running
 	a.Lifecycle().SetOnStarted(func() {
 		startMacApp(ui.ShowInDock())
 		go ctrl.Run(ctx, time.Minute, time.After) // redraw every 60 s, fetch per TTL
