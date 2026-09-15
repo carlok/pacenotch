@@ -20,14 +20,6 @@ import (
 	"github.com/carlok/pacenotch/internal/tui"
 )
 
-// Theme preference values.
-const (
-	prefTheme   = "theme"
-	ThemeDark   = "dark"
-	ThemeSystem = "system"
-	prefCompact = "compact"
-)
-
 // QuitShortcut is Cmd-Q on macOS and Ctrl-Q elsewhere.
 var QuitShortcut = &desktop.CustomShortcut{KeyName: fyne.KeyQ, Modifier: fyne.KeyModifierShortcutDefault}
 
@@ -39,33 +31,50 @@ func windowSize(compact bool) fyne.Size {
 	return fyne.NewSize(600, 460)
 }
 
-// UI is the Fyne glue: it only turns Views into widgets, the tray menu and the tray icon.
+// UI is the Fyne glue: it only turns Views and Settings into widgets, the tray menu and the
+// tray icon.
 type UI struct {
 	App       fyne.App
 	Window    fyne.Window
 	Version   string
+	Settings  *SettingsModel
 	OnRefresh func() // "Refresh now"
 	Quit      func() // the window's Quit button and Cmd/Ctrl-Q; App.Quit by default
 
-	// OnRefreshToken is called when the "refresh expired token" setting changes.
-	OnRefreshToken func(on bool)
+	// OnSettings is called after the settings changed, with the effective values before and
+	// after, so the app can apply the band, the TTL, token refresh and so on.
+	OnSettings func(before, after Settings)
 
-	view     View
-	notifier AheadNotifier
-	about    fyne.Window
+	view        View
+	notifier    AheadNotifier
+	about       fyne.Window
+	settingsWin fyne.Window
 }
 
-// NewUI creates the main window (hidden) and applies the saved theme choice.
+// NewUI creates the main window (hidden) and applies the saved settings.
 func NewUI(a fyne.App, version string) *UI {
-	u := &UI{App: a, Version: version, view: Loading, Quit: a.Quit}
+	u := &UI{App: a, Version: version, view: Loading, Quit: a.Quit, Settings: NewSettingsModel(a.Preferences(), Overrides{})}
 	u.applyTheme()
 	u.Window = a.NewWindow("pacenotch")
 	u.Window.SetCloseIntercept(u.Window.Hide) // closing the window leaves the tray running
 	u.Window.Resize(windowSize(u.Compact()))
 	// Cmd-Q on macOS, Ctrl-Q elsewhere: quits even when the menu bar icon is hidden
 	u.Window.Canvas().AddShortcut(QuitShortcut, func(fyne.Shortcut) { u.Quit() })
+	if runtime.GOOS == "darwin" {
+		// "Settings…" moves into the app menu (pacenotch → Settings…, Cmd-,)
+		u.Window.SetMainMenu(fyne.NewMainMenu(fyne.NewMenu("View",
+			fyne.NewMenuItem("Refresh now", u.refresh),
+			fyne.NewMenuItem("Settings…", u.ShowSettings))))
+	}
 	a.Settings().AddListener(func(fyne.Settings) { u.render() }) // follow OS light/dark changes
 	return u
+}
+
+// ApplyOverrides sets this session's command-line overrides.
+func (u *UI) ApplyOverrides(o Overrides) {
+	u.Settings = NewSettingsModel(u.App.Preferences(), o)
+	u.applyTheme()
+	u.Window.Resize(windowSize(u.Compact()))
 }
 
 // Start builds the tray and shows the window.
@@ -80,7 +89,7 @@ func (u *UI) Publish(v View) { fyne.Do(func() { u.Show(v) }) }
 // Show shows a new view; call on the Fyne goroutine.
 func (u *UI) Show(v View) {
 	u.view = v
-	if u.notifier.Update(v) {
+	if u.notifier.Update(v) && u.Settings.Effective().Notify {
 		u.App.SendNotification(fyne.NewNotification("pacenotch", NotifyText))
 	}
 	u.render()
@@ -94,69 +103,55 @@ func (u *UI) render() {
 	}
 }
 
-// ThemeChoice is "dark" (the default) or "system".
-func (u *UI) ThemeChoice() string {
-	return u.App.Preferences().StringWithFallback(prefTheme, ThemeDark)
+// Update changes the settings, applies what the UI owns (theme, window size, Dock mode),
+// tells the app through OnSettings and redraws.
+func (u *UI) Update(change func(*Settings)) error {
+	before, after, err := u.Settings.Update(change)
+	if err != nil || before == after {
+		return err
+	}
+	if after.Theme != before.Theme {
+		u.applyTheme()
+	}
+	if after.Compact != before.Compact {
+		u.Window.Resize(windowSize(after.Compact))
+	}
+	if after.ShowInDock != before.ShowInDock {
+		setDockVisible(after.ShowInDock)
+	}
+	if u.OnSettings != nil {
+		u.OnSettings(before, after)
+	}
+	u.render()
+	if u.settingsWin != nil {
+		u.settingsWin.SetContent(u.settingsContent())
+	}
+	return nil
 }
+
+// ThemeChoice is "dark" (the default) or "system".
+func (u *UI) ThemeChoice() string { return u.Settings.Effective().Theme }
 
 // SetThemeChoice saves and applies "dark" or "system".
-func (u *UI) SetThemeChoice(choice string) {
-	if choice == u.ThemeChoice() {
-		return
-	}
-	u.App.Preferences().SetString(prefTheme, choice)
-	u.applyTheme()
-	u.render()
-}
+func (u *UI) SetThemeChoice(choice string) { u.Update(func(s *Settings) { s.Theme = choice }) }
 
-// Compact reports whether the window shows one line per window (saved, off by default).
-func (u *UI) Compact() bool {
-	return u.App.Preferences().BoolWithFallback(prefCompact, false)
-}
+// Compact reports whether the window shows one line per window.
+func (u *UI) Compact() bool { return u.Settings.Effective().Compact }
 
 // SetCompact saves the compact choice, resizes the window to fit and redraws.
-func (u *UI) SetCompact(on bool) {
-	if on == u.Compact() {
-		return
-	}
-	u.App.Preferences().SetBool(prefCompact, on)
-	u.Window.Resize(windowSize(on))
-	u.render()
-}
+func (u *UI) SetCompact(on bool) { u.Update(func(s *Settings) { s.Compact = on }) }
 
-// ShowInDock reports whether pacenotch shows in the Dock and Cmd-Tab (macOS; saved, off by
-// default).
-func (u *UI) ShowInDock() bool {
-	return u.App.Preferences().BoolWithFallback(PrefShowInDock, false)
-}
+// ShowInDock reports whether pacenotch shows in the Dock and Cmd-Tab (macOS).
+func (u *UI) ShowInDock() bool { return u.Settings.Effective().ShowInDock }
 
 // SetShowInDock saves the Dock mode and applies it right away.
-func (u *UI) SetShowInDock(on bool) {
-	if on == u.ShowInDock() {
-		return
-	}
-	u.App.Preferences().SetBool(PrefShowInDock, on)
-	setDockVisible(on)
-	u.render()
-}
+func (u *UI) SetShowInDock(on bool) { u.Update(func(s *Settings) { s.ShowInDock = on }) }
 
-// RefreshToken reports whether an expired token is refreshed through Claude Code (saved,
-// on by default).
-func (u *UI) RefreshToken() bool {
-	return u.App.Preferences().BoolWithFallback(PrefRefreshToken, true)
-}
+// RefreshToken reports whether an expired token is refreshed through Claude Code.
+func (u *UI) RefreshToken() bool { return u.Settings.Effective().RefreshToken }
 
-// SetRefreshToken saves the setting and tells the loader.
-func (u *UI) SetRefreshToken(on bool) {
-	if on == u.RefreshToken() {
-		return
-	}
-	u.App.Preferences().SetBool(PrefRefreshToken, on)
-	if u.OnRefreshToken != nil {
-		u.OnRefreshToken(on)
-	}
-	u.render()
-}
+// SetRefreshToken saves the setting; OnSettings tells the loader.
+func (u *UI) SetRefreshToken(on bool) { u.Update(func(s *Settings) { s.RefreshToken = on }) }
 
 func (u *UI) applyTheme() {
 	if u.ThemeChoice() == ThemeDark {
@@ -203,11 +198,6 @@ func (u *UI) Menu() *fyne.Menu {
 	for _, r := range u.view.Rows {
 		items = append(items, fyne.NewMenuItem(r.Menu, u.ShowWindow))
 	}
-	dark := fyne.NewMenuItem("Dark", func() { u.SetThemeChoice(ThemeDark) })
-	system := fyne.NewMenuItem("System", func() { u.SetThemeChoice(ThemeSystem) })
-	dark.Checked, system.Checked = u.ThemeChoice() == ThemeDark, u.ThemeChoice() == ThemeSystem
-	appearance := fyne.NewMenuItem("Appearance", nil)
-	appearance.ChildMenu = fyne.NewMenu("", dark, system)
 	compact := fyne.NewMenuItem("Compact window", func() { u.SetCompact(!u.Compact()) })
 	compact.Checked = u.Compact()
 	quit := fyne.NewMenuItem("Quit", u.App.Quit)
@@ -215,17 +205,8 @@ func (u *UI) Menu() *fyne.Menu {
 	items = append(items, fyne.NewMenuItemSeparator(),
 		fyne.NewMenuItem("Open window", u.ShowWindow),
 		fyne.NewMenuItem("Refresh now", u.refresh),
-		compact)
-	if runtime.GOOS == "darwin" {
-		dock := fyne.NewMenuItem("Show in Dock and Cmd-Tab", func() { u.SetShowInDock(!u.ShowInDock()) })
-		dock.Checked = u.ShowInDock()
-		items = append(items, dock)
-	}
-	token := fyne.NewMenuItem("Refresh expired token via Claude Code", func() { u.SetRefreshToken(!u.RefreshToken()) })
-	token.Checked = u.RefreshToken()
-	items = append(items, token)
-	items = append(items,
-		appearance,
+		compact,
+		fyne.NewMenuItem("Settings…", u.ShowSettings),
 		fyne.NewMenuItem("About pacenotch", u.ShowAbout),
 		fyne.NewMenuItemSeparator(), quit)
 	return fyne.NewMenu("pacenotch", items...)
@@ -281,32 +262,21 @@ func (u *UI) content() fyne.CanvasObject {
 		body.Add(styled(v.Warn, tone(ToneWarn, th), false))
 	}
 
-	choice := widget.NewSelect([]string{"Dark", "System"}, nil)
-	if u.ThemeChoice() == ThemeDark {
-		choice.SetSelected("Dark")
-	} else {
-		choice.SetSelected("System")
-	}
-	choice.OnChanged = func(s string) {
-		if s == "Dark" {
-			u.SetThemeChoice(ThemeDark)
-		} else {
-			u.SetThemeChoice(ThemeSystem)
-		}
-	}
 	compact := widget.NewCheck("Compact", nil)
 	compact.SetChecked(u.Compact())
 	compact.OnChanged = u.SetCompact
 	quit := func() { u.Quit() }
 	footer := container.NewHBox(
 		widget.NewButtonWithIcon("Refresh now", theme.ViewRefreshIcon(), u.refresh),
-		layout.NewSpacer(), compact, choice,
+		layout.NewSpacer(), compact,
+		widget.NewButtonWithIcon("Settings", theme.SettingsIcon(), u.ShowSettings),
 		widget.NewButtonWithIcon("About", theme.InfoIcon(), u.ShowAbout),
 		widget.NewButtonWithIcon("Quit", theme.CancelIcon(), quit))
 	if u.Compact() { // icon-only buttons, so the footer fits the narrow window
 		footer = container.NewHBox(
 			widget.NewButtonWithIcon("", theme.ViewRefreshIcon(), u.refresh),
-			layout.NewSpacer(), compact, choice,
+			layout.NewSpacer(), compact,
+			widget.NewButtonWithIcon("", theme.SettingsIcon(), u.ShowSettings),
 			widget.NewButtonWithIcon("", theme.InfoIcon(), u.ShowAbout),
 			widget.NewButtonWithIcon("", theme.CancelIcon(), quit))
 	}

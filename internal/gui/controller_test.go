@@ -62,6 +62,18 @@ func TestControllerRedrawMovesTheNotch(t *testing.T) {
 	}
 }
 
+func TestControllerSetBand(t *testing.T) {
+	c, _, loads, rec := newController(t, fixture(t, "api-sample"))
+	c.Refresh(context.Background(), true)
+	if rec.views[0].Rows[1].Row.Class != "ahead" {
+		t.Fatalf("7d is +9 with band 5: %+v", rec.views[0].Rows[1].Row)
+	}
+	c.SetBand(10)
+	if last := rec.views[len(rec.views)-1]; last.Rows[1].Row.Class != "on" || loads.Load() != 1 {
+		t.Errorf("with band 10, +9 is on pace without reloading: %+v, loads %d", last.Rows[1].Row, loads.Load())
+	}
+}
+
 func TestControllerRun(t *testing.T) {
 	c, _, loads, rec := newController(t, fixture(t, "api-sample"))
 	rec.ch = make(chan View, 8)
@@ -94,6 +106,8 @@ func TestControllerConcurrent(t *testing.T) {
 				clock.Add(1)
 				if j%3 == 0 {
 					c.Refresh(context.Background(), false)
+				} else if j%7 == 0 {
+					c.SetBand(float64(j % 10))
 				} else {
 					c.Redraw()
 				}

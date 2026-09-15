@@ -119,6 +119,13 @@ func (l *Loader) Load(ctx context.Context, force bool) (Result, error) {
 	return Result{Data: data, Age: age, Stale: true, Err: msg, Warn: warn, Auth: auth}, nil
 }
 
+// SetTTL changes how long cached data is used before fetching again; safe while loading.
+func (l *Loader) SetTTL(ttl time.Duration) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.TTL = ttl
+}
+
 // BackoffUntil reports when the current 429 backoff ends (zero when none).
 func (l *Loader) BackoffUntil() time.Time {
 	l.mu.Lock()

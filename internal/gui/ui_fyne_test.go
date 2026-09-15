@@ -31,6 +31,17 @@ func texts(o fyne.CanvasObject) []string {
 		return []string{x.Text}
 	case *widget.Hyperlink:
 		return []string{x.Text}
+	case *widget.Check:
+		return []string{x.Text}
+	case *widget.Select:
+		return []string{x.Selected}
+	case *widget.Form:
+		var out []string
+		for _, it := range x.Items {
+			out = append(out, it.Text, it.HintText)
+			out = append(out, texts(it.Widget)...)
+		}
+		return out
 	case *container.Scroll:
 		return texts(x.Content)
 	case *fyne.Container:
@@ -61,6 +72,45 @@ func findButton(o fyne.CanvasObject, label string) *widget.Button {
 	return nil
 }
 
+func findIconButton(o fyne.CanvasObject, icon string) *widget.Button {
+	switch x := o.(type) {
+	case *widget.Button:
+		if x.Text == "" && x.Icon != nil && x.Icon.Name() == icon {
+			return x
+		}
+	case *container.Scroll:
+		return findIconButton(x.Content, icon)
+	case *fyne.Container:
+		for _, c := range x.Objects {
+			if b := findIconButton(c, icon); b != nil {
+				return b
+			}
+		}
+	}
+	return nil
+}
+
+// formWidget returns the widget of the form item with the given label.
+func formWidget(o fyne.CanvasObject, label string) fyne.CanvasObject {
+	switch x := o.(type) {
+	case *widget.Form:
+		for _, it := range x.Items {
+			if it.Text == label {
+				return it.Widget
+			}
+		}
+	case *container.Scroll:
+		return formWidget(x.Content, label)
+	case *fyne.Container:
+		for _, c := range x.Objects {
+			if w := formWidget(c, label); w != nil {
+				return w
+			}
+		}
+	}
+	return nil
+}
+
 func sampleView(t *testing.T) View {
 	return BuildView(usage.Result{Data: fixture(t, "api-sample"), Age: 12}, nil, now, 5)
 }
@@ -72,7 +122,7 @@ func TestWindowBuilds(t *testing.T) {
 	u.Show(sampleView(t))
 	all := strings.Join(texts(u.Window.Content()), "\n")
 	for _, want := range []string{"pacenotch", "data 12s old", "7d all models", "72% used  pace 63%  (+9)  ▲ slow down",
-		"resets in 2d 13h", "at this rate: limit in 1d 17h, 20h 4m before reset", "Refresh now", "About"} {
+		"resets in 2d 13h", "at this rate: limit in 1d 17h, 20h 4m before reset", "Refresh now", "Settings", "About", "Quit"} {
 		if !strings.Contains(all, want) {
 			t.Errorf("window is missing %q in\n%s", want, all)
 		}
@@ -89,6 +139,17 @@ func TestWindowBuilds(t *testing.T) {
 
 	u.Window.Close() // intercepted: hidden, the app keeps running
 	u.ShowWindow()
+	if runtime.GOOS == "darwin" {
+		var labels []string
+		for _, m := range u.Window.MainMenu().Items {
+			for _, it := range m.Items {
+				labels = append(labels, it.Label)
+			}
+		}
+		if !strings.Contains(strings.Join(labels, ","), "Settings…") {
+			t.Errorf("the macOS main menu needs Settings…: %v", labels)
+		}
+	}
 }
 
 func TestTrayMenu(t *testing.T) {
@@ -101,7 +162,7 @@ func TestTrayMenu(t *testing.T) {
 	}
 	all := strings.Join(labels, "\n")
 	for _, want := range []string{"⚠ STALE 6m old: network error", "7d  72% / pace 63%  ▲ slow down  · resets 2d 13h",
-		"5h  33% / pace 50%  ▼ room to spare  · resets 2h 30m", "Open window", "Refresh now", "Appearance", "About pacenotch", "Quit"} {
+		"5h  33% / pace 50%  ▼ room to spare  · resets 2h 30m", "Open window", "Refresh now", "Compact window", "Settings…", "About pacenotch", "Quit"} {
 		if !strings.Contains(all, want) {
 			t.Errorf("menu is missing %q in\n%s", want, all)
 		}
@@ -147,19 +208,12 @@ func TestThemeChoice(t *testing.T) {
 	}
 	u.SetThemeChoice(ThemeSystem)
 	u.SetThemeChoice(ThemeSystem) // no-op
-	if a.Preferences().String(prefTheme) != ThemeSystem {
+	if a.Preferences().String(PrefTheme) != ThemeSystem || u.ThemeChoice() != ThemeSystem {
 		t.Error("the choice must be saved")
 	}
-	for _, it := range u.Menu().Items {
-		if it.Label == "Appearance" {
-			if it.ChildMenu.Items[0].Checked || !it.ChildMenu.Items[1].Checked {
-				t.Error("System must be checked")
-			}
-			it.ChildMenu.Items[0].Action()
-		}
-	}
-	if u.ThemeChoice() != ThemeDark {
-		t.Error("the Dark menu item must switch back")
+	u.SetThemeChoice("pink")
+	if u.ThemeChoice() != ThemeSystem {
+		t.Error("invalid values are refused")
 	}
 }
 
@@ -182,7 +236,7 @@ func TestCompactWindow(t *testing.T) {
 	if strings.Contains(all, "budget") || strings.Contains(all, "resets in") {
 		t.Errorf("compact window must not show the detail lines:\n%s", all)
 	}
-	if !a.Preferences().Bool(prefCompact) || u.Window.Canvas().Size().Width > windowSize(false).Width {
+	if !a.Preferences().Bool(PrefCompact) || u.Window.Canvas().Size().Width > windowSize(false).Width {
 		t.Error("the choice is saved and the window shrinks")
 	}
 	for _, it := range u.Menu().Items {
@@ -196,24 +250,6 @@ func TestCompactWindow(t *testing.T) {
 	if u.Compact() || !strings.Contains(strings.Join(texts(u.Window.Content()), "\n"), "budget") {
 		t.Error("the menu item must switch back to the full view")
 	}
-}
-
-func findIconButton(o fyne.CanvasObject, icon string) *widget.Button {
-	switch x := o.(type) {
-	case *widget.Button:
-		if x.Text == "" && x.Icon != nil && x.Icon.Name() == icon {
-			return x
-		}
-	case *container.Scroll:
-		return findIconButton(x.Content, icon)
-	case *fyne.Container:
-		for _, c := range x.Objects {
-			if b := findIconButton(c, icon); b != nil {
-				return b
-			}
-		}
-	}
-	return nil
 }
 
 func TestQuitAndDockMode(t *testing.T) {
@@ -232,38 +268,66 @@ func TestQuitAndDockMode(t *testing.T) {
 	}
 	u.SetCompact(true)
 	quitIcon := findIconButton(u.Window.Content(), theme.CancelIcon().Name())
-	if quitIcon == nil {
-		t.Fatal("the compact footer needs an icon-only Quit button")
+	if quitIcon == nil || findIconButton(u.Window.Content(), theme.SettingsIcon().Name()) == nil {
+		t.Fatal("the compact footer needs icon-only Settings and Quit buttons")
 	}
 	test.Tap(quitIcon)
 	if want++; quits != want {
 		t.Errorf("quit called %d times, want %d", quits, want)
 	}
 
-	var dock *fyne.MenuItem
-	for _, it := range u.Menu().Items {
-		if it.Label == "Show in Dock and Cmd-Tab" {
-			dock = it
-		}
+	if u.ShowInDock() {
+		t.Fatal("Dock mode is off by default")
 	}
-	if runtime.GOOS != "darwin" {
-		if dock != nil {
-			t.Error("the Dock mode item is macOS only")
-		}
-		return
-	}
-	if dock == nil || dock.Checked || u.ShowInDock() {
-		t.Fatalf("Dock mode must be off by default: %+v", dock)
-	}
-	dock.Action()
-	u.SetShowInDock(true) // no-op
+	u.SetShowInDock(true)
 	if !u.ShowInDock() || !a.Preferences().Bool(PrefShowInDock) {
 		t.Error("the Dock mode choice must be saved")
 	}
-	for _, it := range u.Menu().Items {
-		if it.Label == "Show in Dock and Cmd-Tab" && !it.Checked {
-			t.Error("the Dock mode item must be checked")
+}
+
+func TestSettingsWindow(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	var changes [][2]Settings
+	u.OnSettings = func(before, after Settings) { changes = append(changes, [2]Settings{before, after}) }
+	u.Start()
+	u.ShowSettings()
+	u.ShowSettings() // reuses the window
+	content := u.settingsWin.Content()
+	all := strings.Join(texts(content), "\n")
+	for _, want := range []string{LabelBand, "5", LabelTTL, "3 min", LabelNotify, LabelTheme, "Dark", LabelRefreshToken, "never writes the token"} {
+		if !strings.Contains(all, want) {
+			t.Errorf("settings are missing %q in\n%s", want, all)
 		}
+	}
+	if (runtime.GOOS == "darwin") != strings.Contains(all, "Show in Dock and Cmd-Tab") {
+		t.Error("the Dock setting is macOS only")
+	}
+
+	formWidget(content, LabelBand).(*widget.Select).SetSelected("10")
+	content = u.settingsWin.Content() // rebuilt after the change
+	formWidget(content, LabelTTL).(*widget.Select).SetSelected("5 min")
+	content = u.settingsWin.Content()
+	test.Tap(formWidget(content, LabelNotify).(*widget.Check))
+	content = u.settingsWin.Content()
+	formWidget(content, LabelTheme).(*widget.Select).SetSelected("System")
+	content = u.settingsWin.Content()
+	test.Tap(formWidget(content, LabelRefreshToken).(*widget.Check))
+
+	s := u.Settings.Effective()
+	if s.Band != 10 || s.TTL != 300 || s.Notify || s.Theme != ThemeSystem || s.RefreshToken {
+		t.Errorf("settings %+v", s)
+	}
+	if a.Preferences().Float(PrefBand) != 10 || a.Preferences().Int(PrefTTL) != 300 || len(changes) != 5 ||
+		changes[0][0].Band != 5 || changes[0][1].Band != 10 {
+		t.Errorf("saved band %v ttl %v, changes %+v", a.Preferences().Float(PrefBand), a.Preferences().Int(PrefTTL), changes)
+	}
+
+	band := 3.0
+	u.ApplyOverrides(Overrides{Band: &band})
+	u.ShowSettings()
+	if all = strings.Join(texts(u.settingsWin.Content()), "\n"); !strings.Contains(all, "set by -b for this session") || u.Settings.Effective().Band != 3 {
+		t.Errorf("override hint missing:\n%s", all)
 	}
 }
 
@@ -271,19 +335,12 @@ func TestRefreshTokenSetting(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "test")
 	var got []bool
-	u.OnRefreshToken = func(on bool) { got = append(got, on) }
+	u.OnSettings = func(before, after Settings) { got = append(got, after.RefreshToken) }
 	if !u.RefreshToken() {
 		t.Fatal("token refresh is on by default")
 	}
 	u.SetRefreshToken(true) // no-op
-	for _, it := range u.Menu().Items {
-		if it.Label == "Refresh expired token via Claude Code" {
-			if !it.Checked {
-				t.Error("the menu item must be checked")
-			}
-			it.Action()
-		}
-	}
+	u.SetRefreshToken(false)
 	if u.RefreshToken() || a.Preferences().BoolWithFallback(PrefRefreshToken, true) || len(got) != 1 || got[0] {
 		t.Errorf("turning it off must save and notify: %v", got)
 	}
@@ -306,6 +363,13 @@ func TestNotifyWhenWeeklyGoesAhead(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "test")
 	test.AssertNotificationSent(t, fyne.NewNotification("pacenotch", NotifyText), func() {
+		u.Show(sampleView(t))
+	})
+
+	a = test.NewTempApp(t)
+	u = NewUI(a, "test")
+	u.Update(func(s *Settings) { s.Notify = false })
+	test.AssertNotificationSent(t, nil, func() {
 		u.Show(sampleView(t))
 	})
 }

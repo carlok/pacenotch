@@ -3,7 +3,9 @@ package gui
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -164,28 +166,54 @@ func (n *AheadNotifier) Update(v View) bool {
 	return fire
 }
 
-// ParseArgs accepts the GUI flags: -b, -c, --ttl (default 180) and --from.
-func ParseArgs(args []string) (tui.Options, error) {
-	o, err := tui.ParseArgs(args, 180)
+// ParseArgs accepts the GUI flags -b, -c, --ttl and --from. -b, --ttl and -c override the
+// saved settings for this session only.
+func ParseArgs(args []string) (tui.Options, Overrides, error) {
+	var ov Overrides
+	o, err := tui.ParseArgs(args, DefaultSettings().TTL)
 	if err != nil {
-		return o, err
+		return o, ov, err
 	}
-	def, _ := tui.ParseArgs(nil, 180)
+	def, _ := tui.ParseArgs(nil, DefaultSettings().TTL)
 	if o.Help {
-		return o, nil
+		return o, ov, nil
 	}
 	if o.Watch != def.Watch || o.Interval != def.Interval || o.Width != def.Width ||
 		o.Raw != def.Raw || o.Color != def.Color || o.ASCII != def.ASCII || o.Version != def.Version {
-		return o, errors.New("the GUI accepts only -b, -c, --ttl and --from")
+		return o, ov, errors.New("the GUI accepts only -b, -c, --ttl and --from")
 	}
-	return o, nil
+	if flagGiven(args, "-b", "--band") {
+		band := o.Band
+		ov.Band = &band
+	}
+	if flagGiven(args, "--ttl") {
+		ttl := o.TTL
+		ov.TTL = &ttl
+	}
+	ov.Compact = o.Compact
+	if err := DefaultSettings().With(ov).Validate(); err != nil {
+		return o, Overrides{}, err
+	}
+	return o, ov, nil
+}
+
+func flagGiven(args []string, names ...string) bool {
+	for _, a := range args {
+		name, _, _ := strings.Cut(a, "=")
+		if slices.Contains(names, name) {
+			return true
+		}
+	}
+	return false
 }
 
 // Help is the `pacenotch gui -h` text.
 const Help = `pacenotch gui: tray icon and window with the vertical pace notch
 
-  -b N         "on pace" band in points (default 5)
-  -c           compact window: one line per window (also a switch in the window and tray menu)
-  --ttl SECS   cache time before fetching again (default 180)
+  -b N         "on pace" band in points, for this session (default: Settings, 5)
+  -c           compact window, for this session (default: Settings)
+  --ttl SECS   cache time before fetching again, for this session (default: Settings, 180)
   --from FILE  read JSON from FILE instead of the API
+
+Everything else, and the saved defaults, is in the Settings window.
 `

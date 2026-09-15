@@ -23,7 +23,7 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 		fmt.Fprintf(stderr, "pacenotch: %v\n", err)
 		return 1
 	}
-	opts, err := ParseArgs(args)
+	opts, overrides, err := ParseArgs(args)
 	if err != nil {
 		return fail(err)
 	}
@@ -46,25 +46,38 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	a := app.NewWithID(AppID)
 	a.SetIcon(fyne.NewStaticResource("pacenotch.png", EncodePNG(AppIcon(256))))
 	ui := NewUI(a, version)
-	if opts.Compact {
-		ui.SetCompact(true) // -c turns the saved switch on
-	}
+	ui.ApplyOverrides(overrides)
+	settings := ui.Settings.Effective()
+	loader.SetTTL(time.Duration(settings.TTL) * time.Second)
+
+	setRefresh := func(bool) {}
 	if loader.Source != nil {
 		// stop calling the endpoint while an expired token is unchanged, and (setting on)
 		// let Claude Code refresh it
 		recovering := usage.NewRecoveringSource(loader.Source, nil, now)
 		loader.Source = recovering
 		refresher := claudecli.NewRefresher()
-		ui.OnRefreshToken = func(on bool) {
+		setRefresh = func(on bool) {
 			if on {
 				recovering.SetRefresh(refresher.Refresh)
 			} else {
 				recovering.SetRefresh(nil)
 			}
 		}
-		ui.OnRefreshToken(ui.RefreshToken())
 	}
-	ctrl := &Controller{Load: loader.Load, Now: now, Band: opts.Band, Publish: ui.Publish}
+	setRefresh(settings.RefreshToken)
+	ctrl := &Controller{Load: loader.Load, Now: now, Band: settings.Band, Publish: ui.Publish}
+	ui.OnSettings = func(before, after Settings) {
+		if after.TTL != before.TTL {
+			loader.SetTTL(time.Duration(after.TTL) * time.Second)
+		}
+		if after.RefreshToken != before.RefreshToken {
+			setRefresh(after.RefreshToken)
+		}
+		if after.Band != before.Band {
+			go ctrl.SetBand(after.Band)
+		}
+	}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }
 	setReopenHandler(func() { fyne.Do(ui.ShowWindow) }) // opened again while running
 	a.Lifecycle().SetOnStarted(func() {

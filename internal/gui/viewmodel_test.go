@@ -124,22 +124,27 @@ func TestAheadNotifier(t *testing.T) {
 }
 
 func TestParseArgs(t *testing.T) {
-	o, err := ParseArgs([]string{"-b", "3", "-c", "--ttl", "60", "--from", "x.json"})
-	if err != nil || o.Band != 3 || !o.Compact || o.TTL != 60 || o.From != "x.json" {
-		t.Errorf("%+v %v", o, err)
+	o, ov, err := ParseArgs([]string{"-b", "3", "-c", "--ttl=60", "--from", "x.json"})
+	if err != nil || o.From != "x.json" || ov.Band == nil || *ov.Band != 3 || ov.TTL == nil || *ov.TTL != 60 || !ov.Compact {
+		t.Errorf("%+v %+v %v", o, ov, err)
 	}
-	if o, err = ParseArgs(nil); err != nil || o.TTL != 180 {
-		t.Errorf("default ttl: %+v %v", o, err)
+	if o, ov, err = ParseArgs(nil); err != nil || o.TTL != 180 || ov != (Overrides{}) {
+		t.Errorf("no flags, no overrides: %+v %+v %v", o, ov, err)
 	}
-	if o, err = ParseArgs([]string{"-h"}); err != nil || !o.Help {
+	if _, ov, _ = ParseArgs([]string{"--band=5"}); ov.Band == nil || ov.TTL != nil {
+		t.Errorf("an explicit default is still an override: %+v", ov)
+	}
+	if o, _, err = ParseArgs([]string{"-h"}); err != nil || !o.Help {
 		t.Errorf("help: %+v %v", o, err)
 	}
 	for _, args := range [][]string{{"-w"}, {"--raw"}, {"--width", "3"}, {"--color", "never"}, {"--ascii"}, {"--version"}} {
-		if _, err := ParseArgs(args); err == nil || err.Error() != "the GUI accepts only -b, -c, --ttl and --from" {
+		if _, _, err := ParseArgs(args); err == nil || err.Error() != "the GUI accepts only -b, -c, --ttl and --from" {
 			t.Errorf("%v: %v", args, err)
 		}
 	}
-	if _, err := ParseArgs([]string{"--bogus"}); err == nil {
-		t.Error("unknown flags are errors")
+	for _, args := range [][]string{{"--bogus"}, {"-b", "0"}, {"--ttl", "10"}} {
+		if _, _, err := ParseArgs(args); err == nil {
+			t.Errorf("%v must be an error", args)
+		}
 	}
 }

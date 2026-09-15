@@ -44,6 +44,14 @@ func (c *Controller) Redraw() View {
 	return v
 }
 
+// SetBand changes the "on pace" band and redraws.
+func (c *Controller) SetBand(band float64) {
+	c.mu.Lock()
+	c.Band = band
+	c.mu.Unlock()
+	c.Redraw()
+}
+
 // Run refreshes now and then every interval until ctx ends.
 func (c *Controller) Run(ctx context.Context, every time.Duration, after func(time.Duration) <-chan time.Time) {
 	for {

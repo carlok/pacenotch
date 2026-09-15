@@ -56,7 +56,10 @@ The window, in the Dark appearance (default) and in System with a light OS theme
 
 The compact window, one line per window:
 
+<p>
 <img src="docs/window-compact-dark.png" width="49%" alt="pacenotch compact window, dark">
+<img src="docs/settings-dark.png" width="42%" alt="pacenotch settings window">
+</p>
 
 The tray icon, scaled up 4×: 5-hour bar on top, 7-day below, each with its notch. It is
 2:1 in the macOS menu bar and square on Windows and Linux; the orange badge means stale
@@ -149,21 +152,23 @@ line script without another API call.
 ### GUI
 
 `pacenotch gui [-b N] [-c] [--ttl SECS] [--from FILE]`, or open `pacenotch.app`, or run
-`pacenotch-gui_windows_amd64.exe`.
+`pacenotch-gui_windows_amd64.exe`. The flags override the settings for that session only.
 
 - The **tray menu** has one line per window, like `7d  72% / pace 63%  ▲ slow down  · resets 2d 13h`,
-  then *Open window*, *Refresh now*, *Compact window*, *Appearance* (Dark or System),
-  *About* and *Quit*.
+  then *Open window*, *Refresh now*, *Compact window*, *Settings…*, *About* and *Quit*.
 - The **window** shows the full view with bars that stretch with it, or the compact view
-  (one line per window: label, bar, `72%/63% +9 ▲`) with the *Compact* switch, the tray
-  menu item or `-c`. The choice is saved. Closing the window leaves the tray running.
+  (one line per window: label, bar, `72%/63% +9 ▲`). Closing it leaves the tray running.
+- **Settings** (button in the window, tray menu, and pacenotch → Settings… on macOS) apply
+  and save right away: the on-pace band, how often data is refreshed, notifications,
+  compact window, appearance (Dark or System), *Show in Dock and Cmd-Tab* (macOS) and
+  *Refresh expired token through Claude Code*.
 - Everything **redraws every 60 seconds**, so the notch keeps moving; data is fetched only
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.
 - **Quit** is in the window too (button, or Cmd-Q / Ctrl-Q), not only in the tray menu.
-- **macOS, Show in Dock and Cmd-Tab:** on a MacBook the camera notch can hide menu bar
-  icons. With this setting pacenotch behaves like a regular app: Dock icon, Cmd-Tab, the
-  app menu with Quit, and a click on the Dock icon reopens the window.
+- **macOS, Show in Dock and Cmd-Tab** (Settings): on a MacBook the camera notch can hide
+  menu bar icons. With this setting pacenotch behaves like a regular app: Dock icon,
+  Cmd-Tab, the app menu with Quit, and a click on the Dock icon reopens the window.
 
 ## Platform notes
 

@@ -114,6 +114,21 @@ func TestLoaderCacheAndTTL(t *testing.T) {
 	}
 }
 
+func TestLoaderSetTTL(t *testing.T) {
+	src := &fakeSource{body: `{"n":1}`}
+	l, clk := newTestLoader(t, src)
+	l.Load(ctx, false)
+	clk.Add(2 * time.Minute)
+	l.SetTTL(time.Hour)
+	if l.Load(ctx, false); src.Calls() != 1 {
+		t.Errorf("a longer TTL keeps using the cache: %d calls", src.Calls())
+	}
+	l.SetTTL(time.Minute)
+	if l.Load(ctx, false); src.Calls() != 2 {
+		t.Errorf("a shorter TTL fetches: %d calls", src.Calls())
+	}
+}
+
 func TestLoaderStaleAndErrors(t *testing.T) {
 	src := &fakeSource{body: `{"n":1}`, results: []error{nil, &FetchError{500, "HTTP 500 from usage endpoint"}}}
 	l, clk := newTestLoader(t, src)

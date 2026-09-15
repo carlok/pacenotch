@@ -51,6 +51,8 @@ func TestScreenshots(t *testing.T) {
 		u.SetCompact(false)
 		u.ShowAbout()
 		capture(t, u.about, fyne.NewSize(480, 380), filepath.Join(dir, "about-"+name+".png"))
+		u.ShowSettings()
+		capture(t, u.settingsWin, fyne.NewSize(520, 440), filepath.Join(dir, "settings-"+name+".png"))
 
 		dark := name == "dark"
 		menubar := rgb(0xF2F2F2)
