@@ -153,8 +153,10 @@ func TestRefresher(t *testing.T) {
 	if err := r.Refresh(context.Background()); err != nil {
 		t.Fatal(err)
 	}
+	// filepath.Dir follows the host OS, so compute the expected directory the same way
+	wantEnv := []string{"PATH=" + filepath.Dir("/usr/local/bin/claude") + ":/usr/bin"}
 	if gotDir != "/tmp/empty" || gotPath != "/usr/local/bin/claude" || !reflect.DeepEqual(gotArgs, Args) ||
-		!reflect.DeepEqual(gotEnv, []string{"PATH=/usr/local/bin:/usr/bin"}) || !hasDeadline || !cleaned {
+		!reflect.DeepEqual(gotEnv, wantEnv) || !hasDeadline || !cleaned {
 		t.Errorf("exec got dir=%q path=%q args=%q env=%q deadline=%v cleaned=%v", gotDir, gotPath, gotArgs, gotEnv, hasDeadline, cleaned)
 	}
 
