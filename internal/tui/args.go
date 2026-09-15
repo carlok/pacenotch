@@ -22,6 +22,8 @@ type Options struct {
 	ASCII    bool
 	Help     bool
 	Version  bool
+	// RefreshToken lets Claude Code refresh an expired token (runs claude -p).
+	RefreshToken bool
 }
 
 var (
@@ -89,13 +91,15 @@ func ParseArgs(args []string, defaultTTL int) (Options, error) {
 			if o.Color != "auto" && o.Color != "always" && o.Color != "never" {
 				return o, fmt.Errorf("--color must be auto, always or never, not %q", o.Color)
 			}
-		case "--raw", "--no-color", "--ascii", "-h", "--help", "--version":
+		case "--raw", "--no-color", "--ascii", "-h", "--help", "--version", "--refresh-token":
 			if hasInline {
 				return o, fmt.Errorf("unknown option: %s (try --help)", arg)
 			}
 			switch name {
 			case "--raw":
 				o.Raw = true
+			case "--refresh-token":
+				o.RefreshToken = true
 			case "--no-color":
 				o.Color = "never"
 			case "--ascii":
@@ -131,6 +135,8 @@ The notch ┃ marks an even pace: fill past it means ahead of pace, fill short o
   pacenotch gui             tray icon and window (GUI builds; pacenotch-gui.exe on Windows)
   options: --ttl SECS (cache, default 60) --width N --color auto|always|never --no-color
            --ascii (#, - and | instead of block characters) --version
+           --refresh-token (or PACENOTCH_REFRESH=1): when the token has expired, run a tiny
+             claude -p request so Claude Code refreshes it (pacenotch never writes it)
 
 Exit code (single-shot mode): 0 ok, 1 error, 2 weekly (all models) is ahead of pace.
 Token: $PACENOTCH_TOKEN, else Claude Code's stored credentials (read-only).

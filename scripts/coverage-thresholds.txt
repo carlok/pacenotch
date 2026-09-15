@@ -4,4 +4,5 @@ internal/pace               100  ^internal/pace/
 internal/usage               90  ^internal/usage/
 internal/tui                 90  ^internal/tui/
 internal/gui(model+raster)   90  ^internal/gui/                              _fyne\.go$
+internal/claudecli           90  ^internal/claudecli/
 module(unit+e2e)             85  .

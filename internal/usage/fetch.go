@@ -2,6 +2,7 @@ package usage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -73,6 +74,14 @@ func (f *Fetcher) Fetch(ctx context.Context) ([]byte, string, error) {
 		return body, warn, nil
 	}
 	return nil, warn, statusError(resp.StatusCode)
+}
+
+// Fingerprint identifies the current credentials (see Credentials.Fingerprint).
+func (f *Fetcher) Fingerprint(ctx context.Context) (string, error) {
+	if fp, ok := f.Creds.(fingerprinter); ok {
+		return fp.Fingerprint(ctx)
+	}
+	return "", errors.New("credentials cannot be fingerprinted")
 }
 
 func statusError(code int) *FetchError {

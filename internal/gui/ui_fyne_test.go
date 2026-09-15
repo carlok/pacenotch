@@ -267,6 +267,28 @@ func TestQuitAndDockMode(t *testing.T) {
 	}
 }
 
+func TestRefreshTokenSetting(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	var got []bool
+	u.OnRefreshToken = func(on bool) { got = append(got, on) }
+	if !u.RefreshToken() {
+		t.Fatal("token refresh is on by default")
+	}
+	u.SetRefreshToken(true) // no-op
+	for _, it := range u.Menu().Items {
+		if it.Label == "Refresh expired token via Claude Code" {
+			if !it.Checked {
+				t.Error("the menu item must be checked")
+			}
+			it.Action()
+		}
+	}
+	if u.RefreshToken() || a.Preferences().BoolWithFallback(PrefRefreshToken, true) || len(got) != 1 || got[0] {
+		t.Errorf("turning it off must save and notify: %v", got)
+	}
+}
+
 func TestAboutWindow(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "v9")

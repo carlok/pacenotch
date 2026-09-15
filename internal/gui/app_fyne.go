@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 
+	"github.com/carlok/pacenotch/internal/claudecli"
 	"github.com/carlok/pacenotch/internal/tui"
 	"github.com/carlok/pacenotch/internal/usage"
 )
@@ -47,6 +48,21 @@ func Main(ctx context.Context, args []string, version string, stdout, stderr io.
 	ui := NewUI(a, version)
 	if opts.Compact {
 		ui.SetCompact(true) // -c turns the saved switch on
+	}
+	if loader.Source != nil {
+		// stop calling the endpoint while an expired token is unchanged, and (setting on)
+		// let Claude Code refresh it
+		recovering := usage.NewRecoveringSource(loader.Source, nil, now)
+		loader.Source = recovering
+		refresher := claudecli.NewRefresher()
+		ui.OnRefreshToken = func(on bool) {
+			if on {
+				recovering.SetRefresh(refresher.Refresh)
+			} else {
+				recovering.SetRefresh(nil)
+			}
+		}
+		ui.OnRefreshToken(ui.RefreshToken())
 	}
 	ctrl := &Controller{Load: loader.Load, Now: now, Band: opts.Band, Publish: ui.Publish}
 	ui.OnRefresh = func() { go ctrl.Refresh(ctx, true) }

@@ -47,6 +47,9 @@ type UI struct {
 	OnRefresh func() // "Refresh now"
 	Quit      func() // the window's Quit button and Cmd/Ctrl-Q; App.Quit by default
 
+	// OnRefreshToken is called when the "refresh expired token" setting changes.
+	OnRefreshToken func(on bool)
+
 	view     View
 	notifier AheadNotifier
 	about    fyne.Window
@@ -137,6 +140,24 @@ func (u *UI) SetShowInDock(on bool) {
 	u.render()
 }
 
+// RefreshToken reports whether an expired token is refreshed through Claude Code (saved,
+// on by default).
+func (u *UI) RefreshToken() bool {
+	return u.App.Preferences().BoolWithFallback(PrefRefreshToken, true)
+}
+
+// SetRefreshToken saves the setting and tells the loader.
+func (u *UI) SetRefreshToken(on bool) {
+	if on == u.RefreshToken() {
+		return
+	}
+	u.App.Preferences().SetBool(PrefRefreshToken, on)
+	if u.OnRefreshToken != nil {
+		u.OnRefreshToken(on)
+	}
+	u.render()
+}
+
 func (u *UI) applyTheme() {
 	if u.ThemeChoice() == ThemeDark {
 		u.App.Settings().SetTheme(forcedVariant{theme.DefaultTheme(), theme.VariantDark})
@@ -200,6 +221,9 @@ func (u *UI) Menu() *fyne.Menu {
 		dock.Checked = u.ShowInDock()
 		items = append(items, dock)
 	}
+	token := fyne.NewMenuItem("Refresh expired token via Claude Code", func() { u.SetRefreshToken(!u.RefreshToken()) })
+	token.Checked = u.RefreshToken()
+	items = append(items, token)
 	items = append(items,
 		appearance,
 		fyne.NewMenuItem("About pacenotch", u.ShowAbout),

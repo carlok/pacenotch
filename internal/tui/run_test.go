@@ -63,18 +63,23 @@ func (b *syncBuffer) String() string {
 }
 
 type fakeSource struct {
-	mu    sync.Mutex
-	calls int
-	body  string
-	err   error
+	mu      sync.Mutex
+	calls   int
+	body    string
+	err     error
+	results []error // per call, the last one repeats; overrides err
 }
 
 func (s *fakeSource) Fetch(context.Context) ([]byte, string, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	err := s.err
+	if len(s.results) > 0 {
+		err = s.results[min(s.calls, len(s.results)-1)]
+	}
 	s.calls++
-	if s.err != nil {
-		return nil, "", s.err
+	if err != nil {
+		return nil, "", err
 	}
 	return []byte(s.body), "", nil
 }
@@ -103,6 +108,8 @@ type harness struct {
 	env            map[string]string
 	src            *fakeSource
 	dir            string
+	refreshes      int
+	refreshErr     error
 }
 
 func newHarness(t *testing.T, args ...string) *harness {
@@ -123,6 +130,7 @@ func newHarness(t *testing.T, args ...string) *harness {
 		Resize:     func(context.Context, func() (int, error)) <-chan struct{} { return nil },
 		After:      time.After,
 		NewLoader:  loaderWith(h.dir, h.src),
+		Refresh:    func(context.Context) error { h.refreshes++; return h.refreshErr },
 		Version:    "test",
 	}
 	return h
@@ -189,6 +197,40 @@ func TestMainAPIPath(t *testing.T) {
 	h3.src.err = errors.New(usage.ErrNoCredentials.Error())
 	if code := h3.run(); code != 1 || h3.stderr.String() != "pacenotch: no Claude Code credentials found (run: claude login)\n" {
 		t.Fatalf("no data: exit %d, stderr %q", code, h3.stderr)
+	}
+}
+
+func TestRefreshToken(t *testing.T) {
+	expired := &usage.FetchError{Status: 401, Msg: "HTTP 401: token rejected (start Claude Code once to refresh it)"}
+	for _, enable := range []func(*harness){
+		func(h *harness) { h.deps.Args = append(h.deps.Args, "--refresh-token") },
+		func(h *harness) { h.env[RefreshEnv] = "1" },
+	} {
+		h := newHarness(t, "--width", "90")
+		enable(h)
+		h.src.results = []error{expired, nil}
+		if code := h.run(); code != 2 || h.refreshes != 1 || h.src.Calls() != 2 || h.stderr.String() != "" {
+			t.Errorf("refresh then data: exit %d, refreshes %d, calls %d, stderr %q", code, h.refreshes, h.src.Calls(), h.stderr)
+		}
+	}
+
+	h := newHarness(t, "--refresh-token")
+	h.src.err, h.refreshErr = expired, errors.New("claude failed")
+	if code := h.run(); code != 1 || h.refreshes != 1 || strings.Contains(h.stderr.String(), "tip:") {
+		t.Errorf("failed refresh: exit %d, refreshes %d, stderr %q", code, h.refreshes, h.stderr)
+	}
+}
+
+func TestAuthTip(t *testing.T) {
+	h := newHarness(t)
+	h.src.err = &usage.FetchError{Status: 401, Msg: "HTTP 401: token rejected (start Claude Code once to refresh it)"}
+	if code := h.run(); code != 1 || !strings.Contains(h.stderr.String(), "pacenotch: tip: --refresh-token") || h.refreshes != 0 {
+		t.Errorf("401 without refresh: exit %d, stderr %q, refreshes %d", code, h.stderr, h.refreshes)
+	}
+	h = newHarness(t)
+	h.src.err = usage.ErrNoCredentials
+	if h.run(); strings.Contains(h.stderr.String(), "tip:") {
+		t.Errorf("no tip without credentials: %q", h.stderr)
 	}
 }
 
@@ -288,7 +330,7 @@ func TestNowFunc(t *testing.T) {
 
 func TestDefaultDeps(t *testing.T) {
 	d := DefaultDeps(context.Background(), []string{"-h"}, "v1")
-	if d.Stdout != os.Stdout || d.Getenv == nil || d.NewLoader == nil || d.After == nil || d.Version != "v1" || d.Loc != time.Local {
+	if d.Stdout != os.Stdout || d.Getenv == nil || d.NewLoader == nil || d.After == nil || d.Refresh == nil || d.Version != "v1" || d.Loc != time.Local {
 		t.Fatalf("unexpected defaults: %+v", d)
 	}
 	d.IsTerminal()

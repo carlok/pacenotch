@@ -132,6 +132,7 @@ pacenotch gui             tray icon and window (GUI builds)
 | `--raw` | print the raw JSON and exit |
 | `--color auto\|always\|never`, `--no-color` | colors; `auto` honours `NO_COLOR` |
 | `--ascii` | `#`, `-` and `\|` instead of block characters |
+| `--refresh-token` | when the token has expired, let Claude Code refresh it (also `PACENOTCH_REFRESH=1`; see [How it works](#how-it-works)) |
 | `--version`, `-h` | version, help |
 
 Exit codes in single-shot mode: `0` fine, `1` error, `2` when *7d all models* is ahead of
@@ -159,6 +160,10 @@ line script without another API call.
 - Everything **redraws every 60 seconds**, so the notch keeps moving; data is fetched only
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.
+- **Quit** is in the window too (button, or Cmd-Q / Ctrl-Q), not only in the tray menu.
+- **macOS, Show in Dock and Cmd-Tab:** on a MacBook the camera notch can hide menu bar
+  icons. With this setting pacenotch behaves like a regular app: Dock icon, Cmd-Tab, the
+  app menu with Quit, and a click on the Dock icon reopens the window.
 
 ## Platform notes
 
@@ -188,9 +193,17 @@ up as boxes or question marks in an old console, use `pacenotch --ascii`.
   pacenotch treats every field as optional and caches the answer.
 - **Token.** `PACENOTCH_TOKEN` if set; otherwise the macOS keychain; otherwise
   `~/.claude/.credentials.json` (`%USERPROFILE%\.claude\.credentials.json` on Windows).
-  It is read-only: pacenotch never refreshes or writes it, and never prints or logs it
-  (tests check stdout, stderr, errors and cache files for a canary token). If it has
-  expired, start Claude Code once.
+  pacenotch never writes it, and never prints or logs it (tests check stdout, stderr,
+  errors and cache files for a canary token).
+- **Expired token.** Claude Code refreshes its token only when it makes a request, and the
+  Claude desktop app keeps a separate login, so the token pacenotch reads can expire while
+  you work. The GUI (setting *Refresh expired token via Claude Code*, on by default) and
+  `pacenotch --refresh-token` then run one tiny headless request,
+  `claude -p "Reply with OK." --model haiku --no-session-persistence --restricted`, from an
+  empty folder, at most every 10 minutes. Claude Code refreshes its own token as a side
+  effect; the request uses a very small amount of your usage. While the token stays
+  expired, pacenotch shows the last data as STALE and stops calling the endpoint until the
+  credentials change.
 - **Cache.** `usage.json` in `pacenotch/` under the user cache directory
   (`~/Library/Caches` on macOS, `~/.cache` on Linux, `%LocalAppData%` on Windows). When a
   fetch fails, the cached data is shown marked **STALE** with its age and the reason.

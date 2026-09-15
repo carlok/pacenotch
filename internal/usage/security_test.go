@@ -3,6 +3,7 @@ package usage
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -79,6 +80,31 @@ func TestTokenNeverLeaks(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestRecoveringSourceNeverLeaks: a refresh whose error text contains the token must not
+// surface it, and neither may the credential fingerprint.
+func TestRecoveringSourceNeverLeaks(t *testing.T) {
+	srv := httptest.NewServer(echo(401))
+	defer srv.Close()
+	env := map[string]string{TokenEnv: canary}
+	creds := &Credentials{GOOS: "linux", Getenv: func(k string) string { return env[k] }, Now: time.Now}
+	f := &Fetcher{URL: srv.URL, Client: srv.Client(), Creds: creds, Timeout: time.Second}
+	clk := &fakeClock{t: time.Unix(1789126200, 0)}
+	s := NewRecoveringSource(f, func(context.Context) error { return errors.New("claude said " + canary) }, clk.Now)
+	var seen []string
+	for i := 0; i < 3; i++ {
+		body, warn, err := s.Fetch(context.Background())
+		seen = append(seen, string(body), warn, fmt.Sprint(err), fmt.Sprintf("%#v", err))
+		clk.Add(11 * time.Minute)
+	}
+	fp, _ := f.Fingerprint(context.Background())
+	seen = append(seen, fp)
+	for _, x := range seen {
+		if strings.Contains(x, "CANARY") {
+			t.Fatalf("token leaked: %q", x)
+		}
 	}
 }
 

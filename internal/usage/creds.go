@@ -3,6 +3,8 @@ package usage
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"math"
@@ -114,4 +116,16 @@ func (c *Credentials) Token(ctx context.Context) (Token, string, error) {
 		}
 	}
 	return Token{tok}, warn, nil
+}
+
+// Fingerprint changes whenever the stored token changes, without revealing it: the first
+// 8 bytes of its SHA-256, hex encoded. It lets a watcher notice that Claude Code refreshed
+// the token without calling the endpoint.
+func (c *Credentials) Fingerprint(ctx context.Context) (string, error) {
+	tok, _, err := c.Token(ctx)
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256([]byte(tok.s))
+	return hex.EncodeToString(sum[:8]), nil
 }

@@ -35,6 +35,7 @@ func TestParseArgs(t *testing.T) {
 		{[]string{"--no-color"}, with(func(o *Options) { o.Color = "never" })},
 		{[]string{"--ascii"}, with(func(o *Options) { o.ASCII = true })},
 		{[]string{"--version"}, with(func(o *Options) { o.Version = true })},
+		{[]string{"--refresh-token"}, with(func(o *Options) { o.RefreshToken = true })},
 		{[]string{"-h", "--bogus"}, with(func(o *Options) { o.Help = true })},
 		{[]string{"--help"}, with(func(o *Options) { o.Help = true })},
 	}

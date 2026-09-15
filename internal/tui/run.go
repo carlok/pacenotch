@@ -14,6 +14,7 @@ import (
 
 	"golang.org/x/term"
 
+	"github.com/carlok/pacenotch/internal/claudecli"
 	"github.com/carlok/pacenotch/internal/pace"
 	"github.com/carlok/pacenotch/internal/usage"
 )
@@ -42,8 +43,12 @@ type Deps struct {
 	Resize     func(ctx context.Context, size func() (int, error)) <-chan struct{}
 	After      func(time.Duration) <-chan time.Time
 	NewLoader  LoaderFunc
+	Refresh    func(ctx context.Context) error // asks Claude Code to refresh an expired token
 	Version    string
 }
+
+// RefreshEnv set to 1 turns on --refresh-token.
+const RefreshEnv = "PACENOTCH_REFRESH"
 
 // DefaultDeps uses the process's stdio, environment, terminal and clock.
 func DefaultDeps(ctx context.Context, args []string, version string) Deps {
@@ -57,6 +62,7 @@ func DefaultDeps(ctx context.Context, args []string, version string) Deps {
 		Resize:     resizeEvents,
 		After:      time.After,
 		NewLoader:  usage.NewLoader,
+		Refresh:    claudecli.NewRefresher().Refresh,
 		Version:    version,
 	}
 }
@@ -96,6 +102,16 @@ func Main(d Deps) int {
 	if err != nil {
 		return fail(err)
 	}
+	// Watch mode stops calling the endpoint while an expired token has not changed;
+	// --refresh-token also asks Claude Code to refresh it.
+	refresh := opts.RefreshToken || d.Getenv(RefreshEnv) == "1"
+	if loader.Source != nil && (refresh || opts.Watch) {
+		var f func(context.Context) error
+		if refresh {
+			f = d.Refresh
+		}
+		loader.Source = usage.NewRecoveringSource(loader.Source, f, now)
+	}
 
 	if opts.Raw {
 		res, err := loader.Load(d.Ctx, false)
@@ -123,7 +139,12 @@ func Main(d Deps) int {
 
 	res, err := loader.Load(d.Ctx, false)
 	if err != nil {
-		return fail(err)
+		code := fail(err)
+		var le *usage.LoadError
+		if errors.As(err, &le) && strings.HasPrefix(le.Msg, "HTTP 401") && !refresh {
+			fmt.Fprintf(d.Stderr, "%s: tip: --refresh-token lets Claude Code refresh an expired token\n", Program)
+		}
+		return code
 	}
 	out, rows, err := frame(d, opts, res, now(), st)
 	if err != nil {
