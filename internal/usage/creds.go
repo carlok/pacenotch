@@ -3,8 +3,6 @@ package usage
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"math"
@@ -12,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -76,8 +75,37 @@ func DefaultCredentials(now func() time.Time) *Credentials {
 // Token returns the token from PACENOTCH_TOKEN, then from the macOS keychain (darwin
 // only), then from ~/.claude/.credentials.json (%USERPROFILE%\.claude on Windows).
 func (c *Credentials) Token(ctx context.Context) (Token, string, error) {
+	tok, expiresAt, err := c.read(ctx)
+	if err != nil {
+		return Token{}, "", err
+	}
+	warn := ""
+	if exp := math.Floor(expiresAt / 1000); exp > 0 && exp < float64(c.Now().Unix()) {
+		warn = WarnExpired
+	}
+	return tok, warn, nil
+}
+
+// Fingerprint changes whenever Claude Code stores a new token, without touching the token:
+// it is the token's expiry time (claudeAiOauth.expiresAt), which every refresh moves. A
+// token from PACENOTCH_TOKEN cannot change while pacenotch runs, and a token without an
+// expiry gives "" (treated as unchanged). It lets a watcher notice a refresh without
+// calling the endpoint.
+func (c *Credentials) Fingerprint(ctx context.Context) (string, error) {
+	if c.Getenv(TokenEnv) != "" {
+		return "env", nil
+	}
+	_, expiresAt, err := c.read(ctx)
+	if err != nil || expiresAt == 0 {
+		return "", err
+	}
+	return "expires:" + strconv.FormatFloat(expiresAt, 'f', -1, 64), nil
+}
+
+// read returns the token and its expiry in milliseconds (0 when unknown).
+func (c *Credentials) read(ctx context.Context) (Token, float64, error) {
 	if t := c.Getenv(TokenEnv); t != "" {
-		return Token{t}, "", nil
+		return Token{t}, 0, nil
 	}
 	var creds []byte
 	if c.GOOS == "darwin" {
@@ -94,7 +122,7 @@ func (c *Credentials) Token(ctx context.Context) (Token, string, error) {
 		}
 	}
 	if len(creds) == 0 {
-		return Token{}, "", ErrNoCredentials
+		return Token{}, 0, ErrNoCredentials
 	}
 	var doc struct {
 		OAuth struct {
@@ -103,29 +131,12 @@ func (c *Credentials) Token(ctx context.Context) (Token, string, error) {
 		} `json:"claudeAiOauth"`
 	}
 	if json.Unmarshal(creds, &doc) != nil {
-		return Token{}, "", ErrNoAccessToken
+		return Token{}, 0, ErrNoAccessToken
 	}
 	var tok string
 	if json.Unmarshal(doc.OAuth.AccessToken, &tok) != nil || tok == "" {
-		return Token{}, "", ErrNoAccessToken
+		return Token{}, 0, ErrNoAccessToken
 	}
-	warn := ""
-	if ms, ok := number(doc.OAuth.ExpiresAt); ok {
-		if exp := math.Floor(ms / 1000); exp > 0 && exp < float64(c.Now().Unix()) {
-			warn = WarnExpired
-		}
-	}
-	return Token{tok}, warn, nil
-}
-
-// Fingerprint changes whenever the stored token changes, without revealing it: the first
-// 8 bytes of its SHA-256, hex encoded. It lets a watcher notice that Claude Code refreshed
-// the token without calling the endpoint.
-func (c *Credentials) Fingerprint(ctx context.Context) (string, error) {
-	tok, _, err := c.Token(ctx)
-	if err != nil {
-		return "", err
-	}
-	sum := sha256.Sum256([]byte(tok.s))
-	return hex.EncodeToString(sum[:8]), nil
+	expiresAt, _ := number(doc.OAuth.ExpiresAt)
+	return Token{tok}, expiresAt, nil
 }

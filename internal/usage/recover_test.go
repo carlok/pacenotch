@@ -3,6 +3,7 @@ package usage
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -142,13 +143,21 @@ func TestRecoverFingerprintSources(t *testing.T) {
 }
 
 func TestCredentialsFingerprint(t *testing.T) {
-	os1 := &fakeOS{env: map[string]string{TokenEnv: "token-one"}}
-	os2 := &fakeOS{env: map[string]string{TokenEnv: "token-two"}}
-	a, _ := os1.creds("linux").Fingerprint(ctx)
-	a2, _ := os1.creds("linux").Fingerprint(ctx)
-	b, _ := os2.creds("linux").Fingerprint(ctx)
-	if a == "" || a != a2 || a == b || len(a) != 16 || strings.Contains(a, "token") {
-		t.Errorf("fingerprints %q %q %q", a, a2, b)
+	file := filepath.Join("home", ".claude", ".credentials.json")
+	fp := func(content string) (string, error) {
+		return (&fakeOS{home: "home", files: map[string]string{file: content}}).creds("linux").Fingerprint(ctx)
+	}
+	a, _ := fp(credsJSON("token-one", 1789135200000))
+	a2, _ := fp(credsJSON("token-two", 1789135200000))
+	b, _ := fp(credsJSON("token-two", 1789164000000))
+	if a == "" || a != a2 || a == b || strings.Contains(a+b, "token") {
+		t.Errorf("fingerprints follow the expiry, never the token: %q %q %q", a, a2, b)
+	}
+	if got, err := fp(`{"claudeAiOauth":{"accessToken":"t"}}`); got != "" || err != nil {
+		t.Errorf("no expiry: %q %v", got, err)
+	}
+	if got, _ := (&fakeOS{env: map[string]string{TokenEnv: fakeToken}}).creds("linux").Fingerprint(ctx); got != "env" {
+		t.Errorf("PACENOTCH_TOKEN: %q", got)
 	}
 	if _, err := (&fakeOS{home: "/nowhere"}).creds("linux").Fingerprint(ctx); !errors.Is(err, ErrNoCredentials) {
 		t.Errorf("no credentials: %v", err)
