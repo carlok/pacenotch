@@ -199,7 +199,7 @@ func (f forcedVariant) Color(n fyne.ThemeColorName, _ fyne.ThemeVariant) color.C
 func (u *UI) TrayResource() fyne.Resource {
 	wide := runtime.GOOS == "darwin"
 	dark := u.App.Settings().ThemeVariant() == theme.VariantDark
-	img := TrayIcon(u.view.PaceRows(), u.view.IconState(), 32, wide, Bars(dark))
+	img := TrayIcon(u.view.PaceRows(), u.view.IconState(), 32, wide, TrayBars(dark))
 	return fyne.NewStaticResource("pacenotch-tray.png", EncodePNG(img))
 }
 
