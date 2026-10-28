@@ -63,6 +63,17 @@ func Bars(dark bool) BarTheme {
 	return LightBars()
 }
 
+// TrayBars is the palette of the tray icon. The light window's on-pace fill is a dark
+// amber that stays readable as text on white, but at menu bar size it looks red; the icon
+// has no text, so it uses a real yellow, like the dark palette.
+func TrayBars(dark bool) BarTheme {
+	th := Bars(dark)
+	if !dark {
+		th.Fill[pace.On] = rgb(0xFFCC00)
+	}
+	return th
+}
+
 // Contrast is the WCAG 2 contrast ratio of two opaque colors, from 1 to 21.
 func Contrast(a, b color.NRGBA) float64 {
 	la, lb := luminance(a), luminance(b)

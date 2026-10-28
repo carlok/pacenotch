@@ -9,7 +9,23 @@ import (
 	"github.com/carlok/pacenotch/internal/pace"
 )
 
-var themes = map[string]BarTheme{"dark": DarkBars(), "light": LightBars()}
+var themes = map[string]BarTheme{
+	"dark": DarkBars(), "light": LightBars(), "tray-dark": TrayBars(true), "tray-light": TrayBars(false),
+}
+
+// The tray's on-pace fill must read as yellow at menu bar size, not as the amber that
+// looks like the ahead red there.
+func TestTrayOnPaceIsYellow(t *testing.T) {
+	for _, dark := range []bool{true, false} {
+		c := TrayBars(dark).Fill[pace.On]
+		if 4*int(c.G) < 3*int(c.R) || c.B > 0x40 {
+			t.Errorf("dark=%v: on-pace fill %02X%02X%02X is not yellow", dark, c.R, c.G, c.B)
+		}
+	}
+	if LightBars().Fill[pace.On] == TrayBars(false).Fill[pace.On] {
+		t.Error("the tray palette must not change the window palette")
+	}
+}
 
 func TestPalettes(t *testing.T) {
 	for name, th := range themes {
