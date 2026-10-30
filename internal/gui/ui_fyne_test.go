@@ -383,31 +383,44 @@ func TestUpdateNotice(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "v0.3.0")
 	u.Show(sampleView(t))
+	if !u.Settings.Effective().CheckUpdates {
+		t.Fatal("the update check should be on by default")
+	}
 	u.ShowSettings()
 	test.Tap(formWidget(u.settingsWin.Content(), LabelUpdates).(*widget.Check))
-	if !u.Settings.Effective().CheckUpdates || !a.Preferences().Bool(PrefCheckUpdates) {
-		t.Error("the update check setting must be saved")
+	if u.Settings.Effective().CheckUpdates || a.Preferences().BoolWithFallback(PrefCheckUpdates, true) {
+		t.Error("tapping the setting must save turning it off")
+	}
+	test.Tap(formWidget(u.settingsWin.Content(), LabelUpdates).(*widget.Check))
+	if !u.Settings.Effective().CheckUpdates {
+		t.Error("tapping again must turn the update check back on")
 	}
 
-	rel := update.Release{Tag: "v0.4.0", URL: update.ReleasesPrefix + "tag/v0.4.0"}
+	dl := update.DownloadPrefix + "v0.4.0/pacenotch-gui_linux_amd64"
+	rel := update.Release{Tag: "v0.4.0", URL: update.ReleasesPrefix + "tag/v0.4.0", DownloadURL: dl}
 	u.SetUpdate(rel)
-	var item *fyne.MenuItem
+	var updateItem, notesItem *fyne.MenuItem
 	for _, it := range u.Menu().Items {
-		if it.Label == "Update available: v0.4.0" {
-			item = it
+		switch it.Label {
+		case "Update available: v0.4.0":
+			updateItem = it
+		case "Release notes":
+			notesItem = it
 		}
 	}
-	if item == nil {
-		t.Fatal("the tray menu needs the update notice")
+	if updateItem == nil || notesItem == nil {
+		t.Fatal("the tray menu needs the update notice and release notes")
 	}
-	item.Action() // opens the release page through the (test) app
+	updateItem.Action()
+	notesItem.Action()
 	u.ShowAbout()
-	if all := strings.Join(texts(u.about.Content()), "\n"); !strings.Contains(all, "Update available: v0.4.0") {
+	all := strings.Join(texts(u.about.Content()), "\n")
+	if !strings.Contains(all, "Update available: v0.4.0") || !strings.Contains(all, "Release notes") {
 		t.Errorf("About is missing the notice:\n%s", all)
 	}
 	u.SetUpdate(update.Release{})
 	for _, it := range u.Menu().Items {
-		if strings.HasPrefix(it.Label, "Update available") {
+		if strings.HasPrefix(it.Label, "Update available") || it.Label == "Release notes" {
 			t.Error("the notice must go away")
 		}
 	}

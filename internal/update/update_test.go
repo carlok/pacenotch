@@ -51,24 +51,69 @@ func TestDue(t *testing.T) {
 	}
 }
 
+func TestValidDownloadURL(t *testing.T) {
+	ok := DownloadPrefix + "v0.2.2/pacenotch-gui_linux_amd64"
+	if !ValidDownloadURL(ok) || ValidDownloadURL("https://example.com/x") || ValidDownloadURL(ReleasesPrefix+"tag/v0.2.2") {
+		t.Error("ValidDownloadURL")
+	}
+}
+
+func TestGUIAssetURL(t *testing.T) {
+	good := DownloadPrefix + "v0.2.2/"
+	assets := []Asset{
+		{Name: "pacenotch-gui_linux_amd64", URL: good + "pacenotch-gui_linux_amd64"},
+		{Name: "pacenotch-gui_macos_universal.zip", URL: good + "pacenotch-gui_macos_universal.zip"},
+		{Name: "pacenotch-gui_darwin_universal", URL: good + "pacenotch-gui_darwin_universal"},
+		{Name: "pacenotch-gui_windows_amd64.exe", URL: good + "pacenotch-gui_windows_amd64.exe"},
+		{Name: "evil", URL: "https://evil.example/payload"},
+	}
+	if got := GUIAssetURL(assets, "linux", "amd64"); got != good+"pacenotch-gui_linux_amd64" {
+		t.Errorf("linux: %q", got)
+	}
+	if got := GUIAssetURL(assets, "windows", "amd64"); got != good+"pacenotch-gui_windows_amd64.exe" {
+		t.Errorf("windows: %q", got)
+	}
+	if got := GUIAssetURL(assets, "darwin", "arm64"); got != good+"pacenotch-gui_macos_universal.zip" {
+		t.Errorf("darwin prefers zip: %q", got)
+	}
+	zipless := []Asset{{Name: "pacenotch-gui_darwin_universal", URL: good + "pacenotch-gui_darwin_universal"}}
+	if got := GUIAssetURL(zipless, "darwin", "amd64"); got != good+"pacenotch-gui_darwin_universal" {
+		t.Errorf("darwin fallback: %q", got)
+	}
+	if got := GUIAssetURL(assets, "linux", "arm64"); got != "" {
+		t.Errorf("unsupported arch: %q", got)
+	}
+	reject := []Asset{{Name: "pacenotch-gui_linux_amd64", URL: "https://evil.example/x"}}
+	if got := GUIAssetURL(reject, "linux", "amd64"); got != "" {
+		t.Errorf("bad prefix rejected: %q", got)
+	}
+}
+
 func TestLatest(t *testing.T) {
+	dl := DownloadPrefix + "v0.4.0/pacenotch-gui_linux_amd64"
+	page := ReleasesPrefix + "tag/v0.4.0"
+	bodyWithAssets := `{"tag_name":"v0.4.0","html_url":"` + page + `","assets":[` +
+		`{"name":"pacenotch-gui_linux_amd64","browser_download_url":"` + dl + `"}` +
+		`]}`
 	tests := []struct {
 		name   string
 		status int
 		body   string
+		goos   string
 		want   Release
 		err    error
 	}{
-		{"release", 200, `{"tag_name":"v0.4.0","html_url":"https://github.com/carlok/pacenotch/releases/tag/v0.4.0","assets":[]}`,
-			Release{"v0.4.0", "https://github.com/carlok/pacenotch/releases/tag/v0.4.0"}, nil},
-		{"prerelease", 200, `{"tag_name":"v0.4.0","html_url":"https://github.com/carlok/pacenotch/releases/tag/v0.4.0","prerelease":true}`, Release{}, ErrBadResponse},
-		{"draft", 200, `{"tag_name":"v0.4.0","html_url":"https://github.com/carlok/pacenotch/releases/tag/v0.4.0","draft":true}`, Release{}, ErrBadResponse},
-		{"foreign page", 200, `{"tag_name":"v0.4.0","html_url":"https://example.com/releases/v0.4.0"}`, Release{}, ErrBadResponse},
-		{"bad tag", 200, `{"tag_name":"latest","html_url":"https://github.com/carlok/pacenotch/releases/tag/latest"}`, Release{}, ErrBadResponse},
-		{"bad JSON", 200, `{"tag_name":`, Release{}, ErrBadResponse},
-		{"rate limit", 403, `{"message":"API rate limit exceeded"}`, Release{}, ErrRateLimited},
-		{"too many requests", 429, ``, Release{}, ErrRateLimited},
-		{"no releases", 404, `{"message":"Not Found"}`, Release{}, ErrBadResponse},
+		{"release", 200, bodyWithAssets, "linux", Release{"v0.4.0", page, dl}, nil},
+		{"no asset", 200, `{"tag_name":"v0.4.0","html_url":"` + page + `","assets":[]}`, "linux",
+			Release{"v0.4.0", page, ""}, nil},
+		{"prerelease", 200, `{"tag_name":"v0.4.0","html_url":"` + page + `","prerelease":true}`, "linux", Release{}, ErrBadResponse},
+		{"draft", 200, `{"tag_name":"v0.4.0","html_url":"` + page + `","draft":true}`, "linux", Release{}, ErrBadResponse},
+		{"foreign page", 200, `{"tag_name":"v0.4.0","html_url":"https://example.com/releases/v0.4.0"}`, "linux", Release{}, ErrBadResponse},
+		{"bad tag", 200, `{"tag_name":"latest","html_url":"` + page + `"}`, "linux", Release{}, ErrBadResponse},
+		{"bad JSON", 200, `{"tag_name":`, "linux", Release{}, ErrBadResponse},
+		{"rate limit", 403, `{"message":"API rate limit exceeded"}`, "linux", Release{}, ErrRateLimited},
+		{"too many requests", 429, ``, "linux", Release{}, ErrRateLimited},
+		{"no releases", 404, `{"message":"Not Found"}`, "linux", Release{}, ErrBadResponse},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -81,7 +126,11 @@ func TestLatest(t *testing.T) {
 				io.WriteString(w, tt.body)
 			}))
 			defer srv.Close()
-			c := &Checker{URL: srv.URL, Client: srv.Client(), Timeout: time.Second}
+			goos := tt.goos
+			if goos == "" {
+				goos = "linux"
+			}
+			c := &Checker{URL: srv.URL, Client: srv.Client(), Timeout: time.Second, GOOS: goos, GOARCH: "amd64"}
 			got, err := c.Latest(context.Background())
 			if got != tt.want || !errors.Is(err, tt.err) {
 				t.Errorf("got %+v, %v; want %+v, %v", got, err, tt.want, tt.err)

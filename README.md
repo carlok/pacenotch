@@ -162,10 +162,12 @@ line script without another API call.
   and save right away: the on-pace band, how often data is refreshed, notifications,
   compact window, appearance (Dark or System), *Show in Dock and Cmd-Tab* (macOS),
   *Refresh expired token through Claude Code*, *Start pacenotch when I log in* and
-  *Check for a newer release once a day* (off by default).
+  *Check for a newer release once a day* (on by default for new installs).
 - **Update notice:** with the update check on, pacenotch asks GitHub's latest-release API at
   most once a day. When a newer release exists, "Update available" appears in the tray menu
-  and the About window and opens the release page. Nothing is downloaded or installed.
+  and the About window; the main action opens the GUI download for your platform when GitHub
+  lists one, and *Release notes* opens the release page. Nothing is downloaded or installed
+  automatically.
 - Everything **redraws every 60 seconds**, so the notch keeps moving; data is fetched only
   when the cache is older than `--ttl`.
 - A **notification** appears once each time *7d all models* goes ahead of pace.
