@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"net/url"
 	"runtime"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -62,7 +63,25 @@ func (u *UI) SetUpdate(rel update.Release) {
 }
 
 func (u *UI) openUpdate() {
-	if link, err := url.Parse(u.update.URL); err == nil {
+	u.openReleaseLink(u.updateDownloadURL())
+}
+
+func (u *UI) openReleaseNotes() {
+	u.openReleaseLink(u.update.URL)
+}
+
+func (u *UI) updateDownloadURL() string {
+	if update.ValidDownloadURL(u.update.DownloadURL) {
+		return u.update.DownloadURL
+	}
+	if strings.HasPrefix(u.update.URL, update.ReleasesPrefix) {
+		return u.update.URL
+	}
+	return ""
+}
+
+func (u *UI) openReleaseLink(raw string) {
+	if link, err := url.Parse(raw); err == nil && link.Scheme != "" {
 		u.App.OpenURL(link)
 	}
 }
@@ -215,7 +234,9 @@ func (u *UI) Menu() *fyne.Menu {
 		items = append(items, fyne.NewMenuItem(r.Menu, u.ShowWindow))
 	}
 	if text := UpdateText(u.update); text != "" {
-		items = append(items, fyne.NewMenuItemSeparator(), fyne.NewMenuItem(text, u.openUpdate))
+		items = append(items, fyne.NewMenuItemSeparator(),
+			fyne.NewMenuItem(text, u.openUpdate),
+			fyne.NewMenuItem("Release notes", u.openReleaseNotes))
 	}
 	compact := fyne.NewMenuItem("Compact window", func() { u.SetCompact(!u.Compact()) })
 	compact.Checked = u.Compact()
@@ -364,8 +385,11 @@ func (u *UI) ShowAbout() {
 		styled(lines[5], th.Dim, false),
 	)
 	if text := UpdateText(u.update); text != "" {
-		if link, err := url.Parse(u.update.URL); err == nil {
-			box.Add(widget.NewHyperlink(text, link))
+		if dl, err := url.Parse(u.updateDownloadURL()); err == nil {
+			box.Add(widget.NewHyperlink(text, dl))
+		}
+		if notes, err := url.Parse(u.update.URL); err == nil {
+			box.Add(widget.NewHyperlink("Release notes", notes))
 		}
 	}
 	u.about.SetContent(container.NewPadded(box))

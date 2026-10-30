@@ -10,9 +10,10 @@ import (
 
 // Update check preference keys: the last check (Unix seconds) and the latest release seen.
 const (
-	PrefUpdateLastCheck = "update.lastCheck"
-	PrefUpdateTag       = "update.tag"
-	PrefUpdateURL       = "update.url"
+	PrefUpdateLastCheck   = "update.lastCheck"
+	PrefUpdateTag         = "update.tag"
+	PrefUpdateURL         = "update.url"
+	PrefUpdateDownloadURL = "update.downloadURL"
 )
 
 // UpdateText is the notice for a newer release, or "" when there is none.
@@ -44,9 +45,14 @@ func (u *Updater) Tick(ctx context.Context) {
 		if rel, err := u.Check(ctx); err == nil {
 			u.Store.SetString(PrefUpdateTag, rel.Tag)
 			u.Store.SetString(PrefUpdateURL, rel.URL)
+			u.Store.SetString(PrefUpdateDownloadURL, rel.DownloadURL)
 		}
 	}
-	rel := update.Release{Tag: u.Store.StringWithFallback(PrefUpdateTag, ""), URL: u.Store.StringWithFallback(PrefUpdateURL, "")}
+	rel := update.Release{
+		Tag:         u.Store.StringWithFallback(PrefUpdateTag, ""),
+		URL:         u.Store.StringWithFallback(PrefUpdateURL, ""),
+		DownloadURL: u.Store.StringWithFallback(PrefUpdateDownloadURL, ""),
+	}
 	if update.Newer(u.Version, rel.Tag) && strings.HasPrefix(rel.URL, update.ReleasesPrefix) {
 		u.OnFound(rel)
 	}

@@ -69,7 +69,7 @@ type Settings struct {
 
 // DefaultSettings are used for anything not saved yet.
 func DefaultSettings() Settings {
-	return Settings{Band: 5, TTL: 180, Notify: true, Theme: ThemeDark, RefreshToken: true}
+	return Settings{Band: 5, TTL: 180, Notify: true, Theme: ThemeDark, RefreshToken: true, CheckUpdates: true}
 }
 
 // Validate checks the ranges.
