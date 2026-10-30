@@ -1,6 +1,6 @@
 module github.com/carlok/pacenotch
 
-go 1.27
+go 1.27.3
 
 require (
 	fyne.io/fyne/v2 v2.8.1
