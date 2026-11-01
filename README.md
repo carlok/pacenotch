@@ -73,7 +73,7 @@ data or a sign-in problem.
 
 ## What it shows
 
-For each window (5-hour session, 7-day all models, and 7-day Sonnet or Opus when your plan
+For each window (5-hour session (not on Ultra, see below), 7-day all models, and 7-day Sonnet or Opus when your plan
 reports them):
 
 - **used**, **pace** (the notch) and the difference, with a status: ▲ *slow down* when
@@ -87,6 +87,17 @@ reports them):
 
 Windows that haven't started yet, or that reset since the data was fetched, are shown
 idle, without a notch.
+
+### Ultra plan: no 5-hour window
+
+Verified **Ultra** accounts (the former Max 20x) no longer have a 5-hour limit, so the usage
+endpoint has no 5-hour window for them and pacenotch has nothing to measure a pace against.
+It doesn't make one up from the 7-day numbers. The GUI says so instead: the window shows
+"no 5-hour limit reported (Ultra plans have none)" above the 7-day bars, and the tray icon is
+a single 7-day bar. The terminal output simply lists the windows that exist, as
+`claude-pace.sh` does.
+
+<img src="docs/window-ultra-dark.png" width="60%" alt="pacenotch window for an Ultra account: a note instead of the 5h bar">
 
 ## Install
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -99,6 +100,28 @@ func TestBuildViewStates(t *testing.T) {
 		if v.Header != tt.header || v.HeaderTone != tt.tone || v.IconState() != tt.icon || (tt.check != nil && !tt.check(v)) {
 			t.Errorf("%s: %+v", tt.name, v)
 		}
+	}
+}
+
+func TestBuildViewNoSession(t *testing.T) {
+	build := func(name string) View {
+		return BuildView(usage.Result{Data: fixture(t, name), Age: 5}, nil, now, 5)
+	}
+	for _, name := range []string{"ultra-seven-day-only", "ultra-five-hour-null"} {
+		if v := build(name); !v.NoSession || v.NoWindows || len(v.Rows) != 2 || v.Rows[0].Short != "7d" {
+			t.Errorf("%s: %+v", name, v)
+		}
+	}
+	for _, name := range []string{"api-sample", "idle", "empty"} {
+		if v := build(name); v.NoSession {
+			t.Errorf("%s must not claim a missing 5h window", name)
+		}
+	}
+	if v := build("empty"); !v.NoWindows {
+		t.Error("no windows at all is NoWindows, not NoSession")
+	}
+	if !strings.Contains(NoSessionText, "Ultra") || !strings.Contains(NoWindowsText, "Ultra") {
+		t.Error("the texts must name the Ultra plan")
 	}
 }
 

@@ -41,12 +41,19 @@ func IconLayout(h int, wide, warn bool) (size image.Point, bars [2]image.Rectang
 
 // TrayIcon renders the tray / menu bar icon: two horizontal bars stacked, 5h on top and 7d
 // below, each filled to its used percentage with its vertical pace notch. A window missing
-// from the data is drawn hollow, like an idle one.
+// from the data is drawn hollow, like an idle one. When the data has a 7d window but no 5h
+// one (Ultra accounts have none), the 7d bar is drawn alone, centred.
 func TrayIcon(rows []pace.Row, st IconState, h int, wide bool, th BarTheme) *image.NRGBA {
 	size, bars, badge := IconLayout(h, wide, st.warn())
 	img := image.NewNRGBA(image.Rectangle{Max: size})
-	for i, key := range []string{"five_hour", "seven_day"} {
-		DrawBar(img, bars[i], rowFor(rows, key), th)
+	if !hasKey(rows, "five_hour") && hasKey(rows, "seven_day") {
+		bar := bars[1]
+		bar = bar.Add(image.Pt(0, (size.Y-bar.Dy())/2-bar.Min.Y))
+		DrawBar(img, bar, rowFor(rows, "seven_day"), th)
+	} else {
+		for i, key := range []string{"five_hour", "seven_day"} {
+			DrawBar(img, bars[i], rowFor(rows, key), th)
+		}
 	}
 	if st.warn() {
 		paint(img, badge, th.Warn)

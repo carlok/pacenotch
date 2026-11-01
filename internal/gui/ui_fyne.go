@@ -18,7 +18,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/carlok/pacenotch/internal/pace"
-	"github.com/carlok/pacenotch/internal/tui"
 	"github.com/carlok/pacenotch/internal/update"
 )
 
@@ -275,7 +274,16 @@ func (u *UI) content() fyne.CanvasObject {
 		body.Add(styled(v.Error, tone(ToneWarn, th), false))
 	}
 	if v.NoWindows {
-		body.Add(styled(tui.NoWindows, th.Dim, false))
+		body.Add(styled(NoWindowsText, th.Dim, false))
+	}
+	if v.NoSession {
+		if u.Compact() {
+			label := container.NewGridWrap(fyne.NewSize(44, 22), styled("5h", th.Text, true))
+			body.Add(container.NewBorder(nil, nil, label, nil, styled(NoSessionCompact, th.Dim, false)))
+		} else {
+			body.Add(styled(NoSessionText, th.Dim, false))
+			body.Add(layout.NewSpacer())
+		}
 	}
 	for _, r := range v.Rows {
 		if u.Compact() {
