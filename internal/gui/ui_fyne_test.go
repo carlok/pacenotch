@@ -219,6 +219,31 @@ func TestThemeChoice(t *testing.T) {
 	}
 }
 
+func TestWindowWithoutSession(t *testing.T) {
+	a := test.NewTempApp(t)
+	u := NewUI(a, "test")
+	u.Start()
+	ultra := BuildView(usage.Result{Data: fixture(t, "ultra-seven-day-only"), Age: 12}, nil, now, 5)
+	u.Show(ultra)
+	if all := strings.Join(texts(u.Window.Content()), "\n"); !strings.Contains(all, NoSessionText) || !strings.Contains(all, "7d all models") {
+		t.Errorf("full window:\n%s", all)
+	}
+	u.SetCompact(true)
+	all := strings.Join(texts(u.Window.Content()), "\n")
+	if !strings.Contains(all, "5h") || !strings.Contains(all, NoSessionCompact) || strings.Contains(all, NoSessionText) {
+		t.Errorf("compact window:\n%s", all)
+	}
+	u.Show(BuildView(usage.Result{Data: []byte("{}"), Age: 3}, nil, now, 5))
+	if all := strings.Join(texts(u.Window.Content()), "\n"); !strings.Contains(all, "Ultra") || strings.Contains(all, NoSessionCompact) {
+		t.Errorf("no windows at all:\n%s", all)
+	}
+	u.SetCompact(false)
+	u.Show(sampleView(t))
+	if all := strings.Join(texts(u.Window.Content()), "\n"); strings.Contains(all, NoSessionText) {
+		t.Errorf("a normal view has a 5h window:\n%s", all)
+	}
+}
+
 func TestCompactWindow(t *testing.T) {
 	a := test.NewTempApp(t)
 	u := NewUI(a, "test")

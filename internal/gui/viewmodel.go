@@ -47,6 +47,7 @@ type View struct {
 	Stale       bool
 	AuthError   bool
 	NoWindows   bool
+	NoSession   bool // windows exist but no 5-hour one: Ultra accounts have none
 	Rows        []RowView
 	Extra       string
 	Warn        string
@@ -66,6 +67,15 @@ func (v View) PaceRows() []pace.Row {
 	}
 	return rows
 }
+
+// Texts for the windows the data does not have.
+const (
+	// NoSessionText explains a missing 5-hour window: Ultra accounts have none. It says
+	// "reported" so a gap in the data for another plan is not stated as a fact about the plan.
+	NoSessionText    = "5h  no 5-hour limit reported (Ultra plans have none)"
+	NoSessionCompact = "none"
+	NoWindowsText    = "no usage windows in response (not a Pro, Max or Ultra plan, or no activity yet)"
+)
 
 // Loading is the view before the first load finishes.
 var Loading = View{Header: "loading…", HeaderTone: ToneDim}
@@ -95,10 +105,15 @@ func BuildView(res usage.Result, loadErr error, now time.Time, band float64) Vie
 	}
 	rows := pace.Rows(snap.Windows, now.Unix(), band)
 	v.NoWindows, v.WeeklyAhead, v.Extra = len(rows) == 0, pace.WeeklyAhead(rows), pace.ExtraFooter(snap.Extra)
+	v.NoSession = len(rows) > 0 && !hasKey(rows, "five_hour")
 	for _, r := range rows {
 		v.Rows = append(v.Rows, rowView(r))
 	}
 	return v
+}
+
+func hasKey(rows []pace.Row, key string) bool {
+	return slices.ContainsFunc(rows, func(r pace.Row) bool { return r.Key == key })
 }
 
 func age(s int64) string {

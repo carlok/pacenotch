@@ -76,6 +76,31 @@ func TestTrayIconMissingWindowsAreHollow(t *testing.T) {
 	}
 }
 
+// With a 7d window and no 5h one (Ultra) the icon is the 7d bar alone, centred.
+func TestTrayIconWithoutSession(t *testing.T) {
+	rows := []pace.Row{iconRows()[1]}
+	for name, th := range themes {
+		for _, h := range []int{16, 22, 32, 44} {
+			img := TrayIcon(rows, IconState{}, h, true, th)
+			_, bars, _ := IconLayout(h, true, false)
+			bar := bars[1].Add(image.Pt(0, (h-bars[1].Dy())/2-bars[1].Min.Y))
+			if top, bottom := bar.Min.Y, h-bar.Max.Y; top < 0 || bottom < 0 || top-bottom > 1 || bottom-top > 1 || bar.Dy() != bars[1].Dy() {
+				t.Fatalf("%s h=%d: bar %v is not centred at the usual height", name, h, bar)
+			}
+			checkBar(t, img, bar, rows[0], th)
+			for y := 0; y < h; y++ {
+				if (y < bar.Min.Y || y >= bar.Max.Y) && img.NRGBAAt(img.Bounds().Dx()/2, y).A != 0 {
+					t.Fatalf("%s h=%d: pixel outside the bar at y=%d", name, h, y)
+				}
+			}
+		}
+	}
+	// no data at all keeps both hollow bars, and a 5h-only response keeps the two slots
+	if a, b := TrayIcon(nil, IconState{}, 32, true, DarkBars()), TrayIcon(rows, IconState{}, 32, true, DarkBars()); bytes.Equal(a.Pix, b.Pix) {
+		t.Error("loading and no-5h icons must differ")
+	}
+}
+
 func TestAppIcon(t *testing.T) {
 	th := DarkBars()
 	for _, size := range []int{16, 32, 64, 128, 256, 512, 1024} {

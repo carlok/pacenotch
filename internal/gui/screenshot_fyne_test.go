@@ -34,6 +34,7 @@ func TestScreenshots(t *testing.T) {
 		t.Fatal(err)
 	}
 	v := BuildView(usage.Result{Data: data, Age: 24}, nil, now, 5)
+	ultra := BuildView(usage.Result{Data: fixture(t, "ultra-seven-day-only"), Age: 24}, nil, now, 5)
 	write(t, filepath.Join(dir, "icon.png"), AppIcon(256))
 
 	for _, name := range []string{"dark", "light"} {
@@ -50,6 +51,11 @@ func TestScreenshots(t *testing.T) {
 		u.SetCompact(true)
 		capture(t, u.Window, windowSize(true), filepath.Join(dir, "window-compact-"+name+".png"))
 		u.SetCompact(false)
+		if name == "dark" { // an Ultra account: a 7d window and no 5h one
+			u.Show(ultra)
+			capture(t, u.Window, fyne.NewSize(620, 300), filepath.Join(dir, "window-ultra-"+name+".png"))
+			u.Show(v)
+		}
 		u.ShowAbout()
 		capture(t, u.about, fyne.NewSize(480, 380), filepath.Join(dir, "about-"+name+".png"))
 		u.ShowSettings()
@@ -64,6 +70,7 @@ func TestScreenshots(t *testing.T) {
 			"wide":   TrayIcon(v.PaceRows(), IconState{}, 32, true, Bars(dark)),
 			"square": TrayIcon(v.PaceRows(), IconState{}, 32, false, Bars(dark)),
 			"stale":  TrayIcon(v.PaceRows(), IconState{Stale: true}, 32, true, Bars(dark)),
+			"ultra":  TrayIcon(ultra.PaceRows(), IconState{}, 32, true, Bars(dark)),
 		} {
 			write(t, filepath.Join(dir, "tray-"+name+"-"+suffix+".png"), scale(onBackground(img, menubar), 4))
 		}
