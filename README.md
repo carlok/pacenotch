@@ -119,6 +119,17 @@ make build       # CLI-only binaries for every platform in dist/ (no cgo)
 make build-gui   # native GUI build for this OS (cgo)
 ```
 
+On Windows, without `make` or bash, use the PowerShell script instead. The GUI build uses
+cgo, so it needs `gcc` in `PATH` (for example MinGW-w64 or MSYS2):
+
+```powershell
+.\scripts\build-windows.ps1              # CLI and GUI in dist/
+.\scripts\build-windows.ps1 -Target cli  # or -Target gui
+```
+
+If PowerShell refuses to run scripts, use
+`powershell -ExecutionPolicy Bypass -File scripts\build-windows.ps1`.
+
 On Linux the GUI build needs `libgl1-mesa-dev xorg-dev libxkbcommon-dev libwayland-dev`.
 `go install …@latest` does not work, because `go.mod` replaces the systray module with a
 patched copy (see [Development](#development)).
