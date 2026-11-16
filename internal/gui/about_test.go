@@ -31,6 +31,9 @@ func TestAboutLines(t *testing.T) {
 	if lines[0] != "pacenotch v1.2.3" || !strings.Contains(strings.Join(lines, "\n"), "Not affiliated with, or endorsed by, Anthropic") {
 		t.Errorf("about: %q", lines)
 	}
+	if !strings.Contains(strings.Join(lines, "\n"), "asks GitHub for the latest release") {
+		t.Error("About must say that it contacts GitHub once a day")
+	}
 	if AboutLines("")[0] != "pacenotch dev" {
 		t.Error("empty version")
 	}

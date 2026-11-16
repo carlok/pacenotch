@@ -48,6 +48,26 @@ func TestUpdater(t *testing.T) {
 		t.Fatalf("a failed check waits a day and keeps the known release: checks %d store %v", checks, st)
 	}
 
+	// offline says nothing about GitHub: the next hourly tick tries again, not tomorrow's
+	clock = clock.Add(update.Interval)
+	answerErr = update.ErrNetwork
+	u.Tick(ctx)
+	if checks != 3 || len(found) != 4 {
+		t.Fatalf("offline check: checks %d found %d", checks, len(found))
+	}
+	clock = clock.Add(update.NetworkRetry - time.Minute)
+	u.Tick(ctx)
+	if checks != 3 {
+		t.Fatal("too early to retry after being offline")
+	}
+	clock = clock.Add(time.Minute)
+	answerErr = nil
+	u.Tick(ctx)
+	if checks != 4 || st[PrefUpdateLastCheck] != int(clock.Unix()) {
+		t.Fatalf("retry an hour after being offline: checks %d store %v", checks, st)
+	}
+	found = found[:3]
+
 	u.Version = "v0.4.0"
 	u.Tick(ctx)
 	if len(found) != 3 {

@@ -375,7 +375,7 @@ func (u *UI) ShowAbout() {
 	if u.about == nil {
 		u.about = u.App.NewWindow("About pacenotch")
 		u.about.SetCloseIntercept(u.about.Hide)
-		u.about.Resize(fyne.NewSize(480, 400))
+		u.about.Resize(fyne.NewSize(480, 450))
 	}
 	th := Bars(u.Dark())
 	lines := AboutLines(u.Version)

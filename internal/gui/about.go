@@ -39,7 +39,8 @@ const (
 	Copyright  = "© 2026 Carlo Perassi · MIT License"
 	Credits    = "Built with Go and Fyne. Reads the usage limits with the token Claude Code stores, " +
 		"never writing it; when that token has expired, it can ask Claude Code to refresh it " +
-		"with a one-line request. The usage endpoint is undocumented and may change."
+		"with a one-line request. Once a day it asks GitHub for the latest release " +
+		"(Settings turns this off). The usage endpoint is undocumented and may change."
 )
 
 // AboutLines is the plain-text content of the About window, top to bottom.

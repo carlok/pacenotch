@@ -21,6 +21,7 @@ env:
 jobs:
   test:
     name: test (${{ matrix.os }})
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +51,14 @@ jobs:
         run: |
           scripts/cover.sh
           go tool cover -html=coverage/merged.out -o coverage.html
-      - name: Fuzz (30s per target)
+      - name: Windows build script
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/build-windows.ps1 -Target cli
+          Get-ChildItem dist/pacenotch_windows_*.exe | ForEach-Object { & $_.FullName --version }
+      - name: Fuzz (30s per target, Linux only because the targets are plain Go)
+        if: runner.os == 'Linux'
         run: scripts/fuzz.sh 30s
       - name: Upload coverage report
         if: always()
@@ -71,6 +79,7 @@ jobs:
 
   cli:
     name: CLI-only binaries
+    timeout-minutes: 15
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -88,6 +97,7 @@ jobs:
 
   gui:
     name: GUI build (${{ matrix.os }})
+    timeout-minutes: 30
     needs: test
     strategy:
       fail-fast: false
@@ -116,12 +126,14 @@ jobs:
 
   release:
     name: Release
+    timeout-minutes: 15
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [cli, gui]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v5 # for the release notes header
       - uses: actions/download-artifact@v4
         with:
           pattern: pacenotch-*
@@ -131,4 +143,5 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*
+          body_path: .github/release-notes-header.md
           generate_release_notes: true
