@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -167,6 +168,24 @@ func FuzzParseSemver(f *testing.F) {
 		}
 		if v[0] < 0 || v[1] < 0 || v[2] < 0 || v.Less(v) {
 			t.Fatalf("%q parsed to %v", s, v)
+		}
+	})
+}
+
+// FuzzGUIAssetURL: never panics, and the URL the app would open is either "" or one of the
+// given asset URLs under the release download prefix, whatever the names and addresses are.
+func FuzzGUIAssetURL(f *testing.F) {
+	ok := DownloadPrefix + "v0.2.4/pacenotch-gui_linux_amd64"
+	f.Add("pacenotch-gui_linux_amd64", ok, "pacenotch-gui_macos_universal.zip", "https://evil.example/x", "linux", "amd64")
+	f.Add("pacenotch-gui_macos_universal.zip", DownloadPrefix+"v1/z", "", "", "darwin", "arm64")
+	f.Add("pacenotch-gui_windows_amd64.exe", DownloadPrefix+"../../evil", "x", "", "windows", "amd64")
+	f.Fuzz(func(t *testing.T, n1, u1, n2, u2, goos, goarch string) {
+		got := GUIAssetURL([]Asset{{n1, u1}, {n2, u2}}, goos, goarch)
+		if got == "" {
+			return
+		}
+		if !strings.HasPrefix(got, DownloadPrefix) || (got != u1 && got != u2) {
+			t.Fatalf("GUIAssetURL(%q/%q, %q/%q, %s, %s) = %q", n1, u1, n2, u2, goos, goarch, got)
 		}
 	})
 }

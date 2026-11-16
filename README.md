@@ -274,11 +274,15 @@ tests for the timestamp and response parsers, and the token-leak tests cover the
 
 ```text
 rule                              coverage   minimum  result
-internal/pace                       100.0%      100%  ok (102/102 statements)
-internal/usage                      100.0%       90%  ok (274/274 statements)
-internal/tui                         99.7%       90%  ok (309/310 statements)
-internal/gui(model+raster)          100.0%       90%  ok (208/208 statements)
-module(unit+e2e)                     99.9%       85%  ok (906/907 statements)
+internal/pace                       100.0%      100%  ok (98/98 statements)
+internal/usage                      100.0%       90%  ok (312/312 statements)
+internal/tui                         99.6%       90%  ok (284/285 statements)
+internal/gui(model+raster)          100.0%       90%  ok (334/334 statements)
+internal/claudecli                  100.0%       90%  ok (82/82 statements)
+internal/instance                   100.0%       90%  ok (41/41 statements)
+internal/autostart                  100.0%       90%  ok (102/102 statements)
+internal/update                      96.8%       90%  ok (60/62 statements)
+module(unit+e2e)                     99.8%       85%  ok (1326/1329 statements)
 ```
 
 The minimums live in `scripts/coverage-thresholds.txt`. The profile merges the unit tests

@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 t=${1:-10s}
-for target in internal/usage:FuzzParseResetsAt internal/usage:FuzzParse internal/pace:FuzzRows internal/update:FuzzParseSemver; do
+for target in internal/usage:FuzzParseResetsAt internal/usage:FuzzParse internal/pace:FuzzRows internal/update:FuzzParseSemver internal/update:FuzzGUIAssetURL; do
   pkg=${target%%:*} name=${target##*:}
   echo "== $pkg $name ($t)"
   go test "./$pkg" -run '^$' -fuzz "^$name\$" -fuzztime "$t"

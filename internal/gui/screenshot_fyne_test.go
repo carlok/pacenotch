@@ -57,7 +57,7 @@ func TestScreenshots(t *testing.T) {
 			u.Show(v)
 		}
 		u.ShowAbout()
-		capture(t, u.about, fyne.NewSize(480, 380), filepath.Join(dir, "about-"+name+".png"))
+		capture(t, u.about, fyne.NewSize(480, 450), filepath.Join(dir, "about-"+name+".png"))
 		u.ShowSettings()
 		capture(t, u.settingsWin, fyne.NewSize(520, 500), filepath.Join(dir, "settings-"+name+".png"))
 

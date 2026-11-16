@@ -24,6 +24,8 @@ const (
 	DownloadPrefix = "https://github.com/carlok/pacenotch/releases/download/"
 	// Interval is the minimum time between two checks.
 	Interval = 24 * time.Hour
+	// NetworkRetry is how soon a check that could not reach GitHub (offline, say) is tried again.
+	NetworkRetry = time.Hour
 )
 
 // Errors are fixed strings.

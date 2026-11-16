@@ -2,6 +2,7 @@ package gui
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -41,11 +42,16 @@ func (u *Updater) Tick(ctx context.Context) {
 	}
 	now := u.Now()
 	if update.Due(time.Unix(int64(u.Store.IntWithFallback(PrefUpdateLastCheck, 0)), 0), now) {
-		u.Store.SetInt(PrefUpdateLastCheck, int(now.Unix())) // failures wait a day too
-		if rel, err := u.Check(ctx); err == nil {
+		u.Store.SetInt(PrefUpdateLastCheck, int(now.Unix())) // failures wait a day too...
+		rel, err := u.Check(ctx)
+		switch {
+		case err == nil:
 			u.Store.SetString(PrefUpdateTag, rel.Tag)
 			u.Store.SetString(PrefUpdateURL, rel.URL)
 			u.Store.SetString(PrefUpdateDownloadURL, rel.DownloadURL)
+		case errors.Is(err, update.ErrNetwork):
+			// ...except being offline, which says nothing about GitHub: try again soon
+			u.Store.SetInt(PrefUpdateLastCheck, int(now.Add(update.NetworkRetry-update.Interval).Unix()))
 		}
 	}
 	rel := update.Release{
